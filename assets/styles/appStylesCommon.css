@@ -1,0 +1,549 @@
+/* File: appStylesCommon.css
+   Date: 15-Feb-2014  j. westbrook
+
+  Updates:
+     15-Feb-2014 jdw   add misc styles from review module -
+     17-Feb-2014 jdw   move font definitions to a separate include myFonts.css
+      2-Apr-2014 jdw   add ui-front{} to lift the jquery dialogs to the top of the element stack
+
+-------------------------------------------------- */
+
+html,
+body {
+  height: 100%;
+  /* The html and body elements cannot have any padding or margin. */
+}
+.panel {
+    margin: 2px;
+}
+.panel-heading a:after {
+    font-family:'Glyphicons Halflings';
+    content:"\e114";
+    float: left;
+    color: grey;
+}
+.panel-heading a.collapsed:after {
+    content:"\e080";
+}
+
+/*  For collapsable panel toggle - */
+.Zpanel-title a  .chevron::after {
+    content: "\f078";
+}
+.Zpanel-title a.collapsed .chevron::after {
+    content: "\f054";
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+@media (min-width: 1200px){
+    .container {
+	width: 95%;
+    }
+}
+
+
+/* Set the fixed height of the footer here */
+#footer {
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  #footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+#wrap > .container {
+  padding: 60px 20px 0;
+  max-width: 95%;
+  /* new with  3.1 */
+  margin-left: 20px;
+}
+
+#footer {
+    max-width: 100%;
+}
+
+#footer > .container{
+    max-width: 95%;
+}
+
+
+.navbar .container {
+  max-width: 95%;
+  margin-left: 15px;
+}
+
+
+.container .credit {
+  margin: 20px 0;
+}
+
+code {
+  font-size: 80%;
+}
+
+.right-icon {
+	padding-top: 8px;
+        padding-bottom:  4px;
+}
+
+.highlight {
+  padding: 9px 14px;
+  margin-bottom: 14px;
+  background-color: #f7f7f9;
+  border: 1px solid #e1e1e8;
+  border-radius: 4px;
+}
+.highlight pre {
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  background-color: transparent;
+  border: 0;
+/*   white-space: nowrap; */
+}
+
+.highlight pre code {
+  font-size: inherit;
+  color: #333; /* Effectively the base text color */
+}
+.highlight pre .lineno {
+  display: inline-block;
+  width: 22px;
+  padding-right: 5px;
+  margin-right: 10px;
+  text-align: right;
+  color: #bebec5;
+}
+
+.dl-lg {
+    font-size: 16px;
+}
+
+.ul-lg {
+    font-size: 16px;
+}
+
+.pg-lg {
+    font-size: 16px;
+}
+
+
+.list-group-key {
+  color: #468847;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  border-top-color: #d6e9c6;
+  border-bottom-color: #d6e9c6;
+}
+
+.list-group-item.key-item {
+  background-color: #fcf8e3;
+}
+
+.list-group-item.mandatory-item {
+  background-color: #f2dede;
+}
+
+.list-group-item.other-item {
+  background-color: #d9edf7;
+}
+
+.list-group-item.in-archive-item {
+    background-color: #dff0d8;
+}
+
+.list-group-item.in-ref-chem-dict-item {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.list-group-item.in-ref-bird-dict-item {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+
+.my-page-header {
+  padding-bottom: 9px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.panel-title > a.my-link-color {
+    color: #428bca;
+}
+
+.my-color-wwpdb-green {
+    color:#99c49b;
+}
+
+.btn-wwpdb-green  {
+    color: #ffffff;
+    background-color: #99c49b;
+    border-color: #5cb85c;
+}
+.btn-wwpdb-green:hover,
+.btn-wwpdb-green:focus,
+.btn-wwpdb-green:active,
+.btn-wwpdb-grenn.active,
+.open .dropdown-toggle.btn-wwpdb-green {
+  color: #ffffff;
+  background-color: #47a447;
+  border-color: #398439;
+}
+
+.btn-wwpdb-green:active,
+.btn-wwpdb-green.active,
+.open .dropdown-toggle.btn-wwpdb-green {
+  background-image: none;
+}
+
+
+.btn-wwpdb-lg  {
+  padding: 2px 2px;
+  font-size: 18px;
+  line-height: 1.33;
+  border-radius: 6px;
+}
+
+.panel-group.my-spacer {
+   /*  margin-bottom:  20px; */
+   margin:  4px;
+}
+
+.my-image-glyph-margin  {
+    margin-top:     -8px;
+    margin-bottom:  4px;
+}
+
+/*  override the width or display */
+@media (min-width: 768px) {
+    .dl-horizontal dt {
+	width: 340px;
+    }
+    .dl-horizontal dd {
+	margin-left: 360px;
+    }
+}
+
+
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+.h1 small,
+.h2 small,
+.h3 small,
+.h4 small {
+  font-weight: normal;
+  line-height: 1;
+  color: #444444;
+/*   color: #999999; */
+}
+
+h1 small,
+.h1 small {
+  font-size: 28px;
+}
+
+h2 small,
+.h2 small {
+  font-size: 24px;
+}
+
+h3 small,
+.h3 small,
+h4 small,
+.h4 small {
+  font-size: 22px;
+}
+
+.col-md-1.my-nav-title {
+    padding-right: 0px;
+    color: #3a87ad;
+}
+
+.my-table-scrollable {
+    overflow: auto;
+    max-width: none;
+}
+
+
+.my-navbar-brand {
+  float: left;
+  padding: 15px 15px;
+  font-size: 24px;
+  line-height: 20px;
+  color: #99c49b;
+}
+
+
+.my-rcsb-navbar-brand {
+  float: left;
+  padding: 15px 15px;
+  font-size: 24px;
+  line-height: 20px;
+  color: #5e94c3;
+}
+
+.my-section-padding {
+    padding-top: 100px;
+    margin-top: -100px;
+}
+
+
+/*
+      Modal window for large scrollable image display
+ */
+
+.my-image-scrollable-old {
+    overflow: scroll !important;
+ /*   overflow: scroll
+      max-width: none; */
+    max-width: 100%;
+    /*      height:700px; extra -- */
+    width:100%;
+
+    margin:0;
+    padding:0;
+}
+
+.my-image-scrollable {
+    overflow: scroll !important;
+    max-width: 100%;
+    max-height: 100%;
+    resize: both;
+}
+
+.my-iframe-handle {
+
+}
+
+
+.my-image-iframe {
+	margin:0;
+	padding:0;
+	border:none;
+	transform:rotateY(0deg);
+	-webkit-transform:scale(4,4);
+	-webkit-transform-origin:25% 0%;
+}
+
+.modal.fade .my-modal-dialog {
+  -webkit-transform: translate(0, -25%);
+      -ms-transform: translate(0, -25%);
+          transform: translate(0, -25%);
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+     -moz-transition: -moz-transform 0.3s ease-out;
+       -o-transition: -o-transform 0.3s ease-out;
+          transition: transform 0.3s ease-out;
+}
+
+.modal.in .my-modal-dialog {
+  -webkit-transform: translate(0, 0);
+      -ms-transform: translate(0, 0);
+          transform: translate(0, 0);
+}
+
+.my-modal-dialog {
+  z-index: 1050;
+  width: auto;
+  padding: 75px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Abandoned this */
+.my-tabs-fixed-top {
+  position: fixed;
+  right: 0;
+  left: 0;
+  border-width: 0 0 1px;
+  top: 75;
+  z-index: 1030;
+}
+
+/*
+ *  Extra from review module ==
+ */
+
+form { display: block;
+       /*margin: 20px auto; */
+       border-width: 1px;
+       border-style: solid;
+       border-color:  #dddddd;
+       border-radius: 10px;
+       background: #efefef;
+       padding: 15px;
+       -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+       box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+}
+
+.form-inline .form-group {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+    padding-right: 25px;
+}
+
+/*
+ *   Progress bar styles -- used on file upload pages --
+ */
+
+.progress {
+    position:relative; width:700px; border: 1px solid #ddd; padding: 1px; border-radius: 3px;
+}
+.bar { background-color: #efefef; width:0%; height:20px; border-radius: 3px; }
+.percent { position:absolute; display:inline-block; top:3px; left:48%; }
+
+
+displayOff {display: none}
+
+#loading    {
+        display:none;
+        position:fixed;
+        left:0;
+        top:0;
+        width:100%;
+        height:100%;
+        background:rgba(255,255,255,0.8);
+        z-index:2000;
+    }
+
+#loadingcontent    {
+        display:table;
+        position:fixed;
+        left:0;
+        top:0;
+        width:100%;
+        height:100%;
+    }
+
+#loadingspinner   {
+        display: table-cell;
+        vertical-align:middle;
+        width: 100%;
+        text-align: center;
+        font-size:larger;
+        padding-top:80px;
+    }
+
+/* table definitions */
+table.rs1 {
+  border-collapse: collapse;
+  border:  2px solid #ffffff;
+  padding: 4px;
+}
+
+tr.rs1-even { background-color: #FFFFFF;} /* gray       */
+tr.rs1-odd  { background-color: #DDDDDD;} /* light gray */
+
+td.rs1  {
+  vertical-align: top;
+  border: 2px solid #ffffff;
+  border-spacing: 2px;
+  text-decoration: none;
+  text-align: left;
+}
+
+
+td.rs1-r-fixed  {
+  vertical-align: top;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  font-style: normal;
+  line-height: normal;
+  font-weight: normal;
+  border: 2px solid #ffffff;
+  border-spacing: 2px;
+  text-decoration: none;
+  text-align: right;
+}
+
+
+th.rs1 {
+  border: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+/*  padding: 1em 1.5em 0.1em 0.5em; */
+  padding: 4px;
+  font-size: 15px;
+  font-weight: bold;
+  font-variant: normal;
+  color: #045E24;
+  background-color: #AAAAAA;
+  text-decoration: none;
+  text-align: left;
+}
+
+.collapse {
+	  overflow:  auto;
+}
+
+#status-communication-frame {
+	padding-top: 60px;
+}
+
+.displaynone{display:none}
+
+/*
+ * legacy styles -- jquery ui for coord. edit.
+ */
+.ui-icon {
+    display: inline-block;
+}
+/* A class used by the jQuery UI CSS framework for their dialogs. this is to keep modal dialogs in front of other elements */
+.avoid-ui-front {
+    /* z-index:1000000 !important; */ /* The default is 100. !important overrides the default. */
+    z-index:1000 !important; /* The default is 100. !important overrides the default. */
+}
+
+.width400{width:400px;}
+.widthauto{width:auto}
+.width20px{width:20px}
+.width30px{width:30px}
+.width40px{width:40px}
+.width50px{width:50px}
+.width60px{width:60px}
+.widtha100{width:100%;margin:0;padding:0}
+.width10{width:10%}
+.width15{width:10%}
+.width15{width:15%}
+.width20{width:20%}
+.width25{width:24%}
+.width30{width:30%}
+.width33{width:32%}
+.width40{width:39%}
+.width50{width:49%}
+.width60{width:59%}
+.width75{width:74%}
+.width100{width:100%}
+
+/*
+.affix-bottom {
+    position: relative;
+}
+*/

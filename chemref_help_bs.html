@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--#include virtual="/chem_ref_data_ui/includes/head_common_bs.html"-->
+    <title>Chemical Reference Data Management Module</title>
+  </head>
+  <body>
+    <div id="wrap">
+      <!--#include virtual="/chem_ref_data_ui/includes/page_header_bs.html"-->
+
+      <div class="container">
+	<div class="page-header">
+	  <h3>Chemical Reference <small>Help Information</small> 	    <small id="span_identifier" class="pull-right displaynone"> </small></h3>
+	</div>
+
+
+<h3>Search Options</h3>
+<a name="searchOptions" ></a>
+
+<h4>BIRD Entity Properties</h4>
+<ul>
+<li>BIRD PRD Identifier (whitespace separated list)</li>
+<li>BIRD PRD Family Identifier (whitespace separated list)</li>
+<li>BIRD Entity name (substring)</li>
+<li>BIRD Entity synonym (substring)</li>
+<li>BIRD Entity name or synonym  (substring)</li>
+<li>BIRD Chemical component ID 3-letter code (whitespace separated list)</li>
+<li>BIRD Source organism scientific name (substring)</li>
+<li>BIRD Polymer sequence (3-letter codes) (substring)</li>
+<li>BIRD Polymer sequence (1-letter-codes) (substring)</li>
+<li>BIRD Subcomponent sequence (3-letter codes)</li>
+<li>BIRD Formula (substring)</li>
+<li>BIRD Class - functional class (substring)</li>
+<li>BIRD Type- structural class (substring)</li>
+</ul>
+
+<h4>BIRD Instances in Released and Internal Entries</h4>
+<ul>
+<li>BIRD PRD_ID instances in all entries (whitespace separated substrings)</li>
+<li>BIRD PRD_ID instances in public enties (whitespace separated substrings)</li>
+<li>BIRD PRD_ID instances in internal entries (whitespace separated substrings)</li>
+</ul>
+
+<h4>Chemical Component Entity Properties</h4>
+<ul>
+<li>CC ID (whitespace separated)</li>
+<li>Chemical Component Name (substring)</li>
+<li>Chemical Component Synonym</li>
+<li>Chemical Component Name or Synonym</li>
+<li>Chemical Component Subcomponent sequence (3-letter codes)</li>
+<li>Chemical Component Formula weight (range)  (lower_bound upper_bound)</li>
+</ul>
+
+
+<h4>Chemical Component Instances in Released and Internal Entries</h4>
+<ul>
+<li>CC_ID instances in all entries (whitespace separated substrings)</li>
+<li>CC_ID instances in public entries (whitespace separated substrings)</li>
+<li>CC_ID instances in internal entries (whitespace separated substrings)</li>
+</ul>
+
+<h4>Reference Data Index Search</h4>
+<ul>
+<li>Formula subset</li>
+<li>Formula exact</li>
+<li>Formula heavy atom exact</li>
+<li>Formula bounded subset</li>
+<li>Formula weight (range)  (lower_bound  upper_bound)</li>
+<li>Subcomponent subset  (substring)</li>
+<li>Subcomponents  (matching)</li>
+<li>SMILES (mathching any type SMILES type)</li>
+<li>InChI  (matching)</li>
+<li>InChI Key (matching)</li>
+<li>InChI Key (first 14 characters of key)</li>
+</ul>
+<br />
+
+<h3>Search Option Content Descriptions</h3>
+
+<ul>
+<li>Family ID</li>
+   <ul>
+      <li> Example:  <tt>FAM_000001</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule_family.family_prd_id.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Entity name</li>
+   <ul>
+      <li> Example:  <tt>Cyclosporin A</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule.name.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Entity synonym</li>
+   <ul>
+      <li> Example:  <tt>VONAMYCIN</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule_synonyms.name.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Entity name or synonym</li>
+   <ul>
+      <li> Example:  <tt>CRESTOMYCIN</tt></li>
+   </ul>
+
+
+<li>Source organism scientific name</li>
+   <ul>
+      <li> Example:  <tt>Streptomyces anulatus</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_entity_src_nat.organism_scientific.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+
+<li>Polymer sequence (3-letter codes)
+   <ul>
+      <li> Example:  <tt>SER ALA CYS VAL SER ALA CYS VAL </tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_entity_poly_seq.mon_id.html">PDBx Dictionary Definition</a></li>
+   </ul>
+</li>
+
+<!--
+<li>Polymer sequence (modified, 3-letter-codes)</li>
+   <ul>
+      <li> Example:  <tt>DSN ALA NCY VAL DSN ALA NCY VAL</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_entity_poly_seq.modified_mon_id.html">PDBx Dictionary Definition</a></li>
+   </ul>
+</li>
+-->
+
+<li>One-letter-code sequence</li>
+   <ul>
+      <li> Example:  <tt>TVPGVXTVPGV</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_entity_sequence.one_letter_codes.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Chemical component subcomponent sequence (3-letter codes)</li>
+   <ul>
+      <li> Example:  <tt>PHQ LEU VAL ARG TYR </tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_entity_subcomponents.seq.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Formula</li>
+   <ul>
+      <li> Example:  <tt>C18 H19 N7 O8 S</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule.formula.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Entity class - functional classification</li>
+   <ul>
+      <li> Example:  <tt>immunosuppressant</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule.class.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Entity type - structural classification</li>
+   <ul>
+      <li> Example:  <tt>cyclic undecapeptide</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule.type.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+<li>Corresponding chemical component ID (3-letter code)</li>
+   <ul>
+      <li> Example:  <tt>DM6</tt></li>
+      <li> <a href="http://mmcif.wwpdb.org/dictionaries/mmcif_pdbx_v40.dic/Items/_pdbx_reference_molecule.chem_comp_id.html">PDBx Dictionary Definition</a></li>
+   </ul>
+
+
+</ul>
+
+
+<br />
+
+<h4>Administrative operations on existing reference entries</h4>
+<a name="adminIdOps" ></a>
+<p>
+This option allows you to fetch the current version of an existing PRD Family entry by entry code (e.g. FAM_000001).
+</p>
+
+
+<h4>Administrative operations on PRD definition files</h4>
+<a name="adminFileOps" ></a>
+<p>
+This option allows you check, add, and update PRD Family definition files to the CVS repository.  The input to this option are
+the mmCIF PRD defintion files named using the convention like FAM_000001.cif.
+</p>
+
+<p>
+<h4>Administrative operations on component dictionaries</h4>
+<a name="adminDictOps" ></a>
+<p>
+This group presents options:  to synchronize the current checked-out copy of the PRD repository, and to load the current contents
+of the PRD CVS repository into a relational database.
+</p>
+
+<hr />
+<br />
+      </div> <!--  end container -->
+    </div> <!-- end wrap -->
+
+    <!--#include virtual="/chem_ref_data_ui/includes/page_javascript_bs.html"-->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_footer_bs.html"-->
+  </body>
+</html>

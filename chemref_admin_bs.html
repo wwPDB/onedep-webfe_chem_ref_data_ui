@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--#include virtual="/chem_ref_data_ui/includes/head_common_bs_local.html"-->
+    <title>Chemical Reference Data Management Module</title>
+</head>
+
+<body>
+    <div id="wrap">
+        <!--#include virtual="/chem_ref_data_ui/includes/page_header_bs.html"-->
+        <div class="container">
+            <div class="page-header">
+                <h3>Chemical Reference <small>Admin Tasks</small>       <small id="span_identifier" class="pull-right displaynone"> </small></h3>
+            </div>
+            <p>
+                The forms below provide access to the utilities for accessing and archiving chemical reference dictionary data.</p>
+            <div id="chemref-admin-dialog">
+                <form id="chemref-inline-idops-form" method="get" action="/service/chemref/inline_idops" enctype="application/x-www-form-urlencoded" name="chemref-inline-idops" class="form-inline">
+                    <INPUT name="formid" TYPE="hidden" VALUE="inlineidops">
+                    <fieldset>
+                        <legend>Operations on reference definitions
+                            <a href="chemref_help_bs.html#adminIdOps"> <span class="glyphicon glyphicon-info-sign pull-right"></span> </a>
+                        </legend>
+                        <div class="form-group">
+                            <input type="text" name="idcode" id="chemref-idcode-1" value="" placeholder="CC, PRD, PRDCC or Family ID" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="operation1" class="control-label">Operation</label>
+                            <select id="operation1" name="operation" class="form-control">
+                                <option selected="selected" value="report">Create report</option>
+                                <option value="fetch">Fetch reference definition</option>
+                                <option value="history">Revision history report</option>
+                                <option value="revfetch">Fetch revisions</option>
+                                <option value="remove">Remove reference definition</option>
+                            </select>
+                        </div>
+                        <INPUT id="chemref-inline-idops-button" class="btn btn-primary" TYPE="submit" VALUE="Go">
+                        <div id="chemref-inline-idops-status" class="op-status"></div>
+                        <div id="chemref-inline-idops-links" class="op-links"></div>
+                    </fieldset>
+                </form>
+                <br />
+                <form id="chemref-inline-fileops-form" method="post" action="/service/chemref/inline_fileops" enctype="multipart/form-data" class="form-inline">
+                    <INPUT name="formid" TYPE="hidden" VALUE="inlinefileops">
+                    <INPUT name="idcode" TYPE="hidden" VALUE="__T">
+                    <fieldset>
+                        <legend>Operations chemical reference files
+                            <a href="chemref_help_bs.html#adminFileOps"> <span class="glyphicon glyphicon-info-sign pull-right"></span> </a>
+                        </legend>
+                        <div class="form-group">
+                            <input type="file" name="file" id="chemref-fname-1" value="" class="form-control" placeholder="Reference file name">
+                        </div>
+                        <div class="form-group">
+                            <label for="operation" class="control-label">Operation</label>
+                            <select name="operation" class="form-control">
+                                <option selected="selected" value="check">Check definition </option>
+                                <option value="report">Create report</option>
+                                <option value="cvsupdate">Update existing definition</option>
+                                <option value="cvsadd">Add new definition</option>
+                                <option value="annotatecomp">Annotate chemical component definition</option>
+                            </select>
+                        </div>
+                        <input id="chemref-inline-idops-button" class="btn btn-primary" TYPE="submit" VALUE="Go">
+                        <div id="chemref-inline-fileops-status" class="op-status"></div>
+                        <div id="chemref-inline-fileops-links" class="op-links"></div>
+                    </fieldset>
+                </form>
+                <br />
+                <form id="chemref-admin-ops-form" method="get" action="/service/chemref/adminops" enctype="application/x-www-form-urlencoded" name="chemref-admin-ops" class="form-inline">
+                    <INPUT name="formid" TYPE="hidden" VALUE="chemrefadminops">
+                    <fieldset>
+                        <legend>Administrative operations on chemical reference data repositories and databases
+                            <a href="chemref_help_bs.html#adminFileOps">
+                                <span class="glyphicon glyphicon-info-sign pull-right"></span> </a>
+                        </legend>
+                        <div class="form-group">
+                            <label for="operation" class="control-label">Admistrative operations</label>
+                            <select name="operation" class="form-control">
+                                <option selected="selected" value="updatedatabasebird">Update BIRD database</option>
+                                <option value="synccvsbird">Synchronize BIRD repositories</option>
+                                <option value="updatedatabasecc">Update chemical component database</option>
+                                <option value="synccvscc">Synchronize chemical component repository</option>
+                                <option value="updatesupportfiles">Update chemical component support files</option>
+                                <option value="updateindexfiles">Update chemical component index files</option>
+                            </select>
+                        </div>
+                        <INPUT id="chemref-admin-ops-button" class="btn btn-primary" TYPE="submit" VALUE="Go">
+                        <div id="chemref-admin-status" class="op-status"></div>
+                    </fieldset>
+                </form>
+                <!--
+                <div id="chemref-report-results-container">
+                    <div id="chemref-inline-idops-report" class="report-content"></div>
+                </div>
+                -->
+             <br />
+            <div id="chemref-report-results-container" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Reports</div>
+                </div>
+                <div id="report-content" class="report-content"></div>
+            </div>
+
+                <!-- END TEXT HERE  -->
+                <!-- progress spinner -->
+                <div id="loading">
+                    <div id="loadingcontent">
+                        <p id="loadingspinner">
+                            Running ...
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- end chemref admin dialog -->
+        </div>
+        <!--  end container -->
+    </div>
+    <!-- end wrap -->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_javascript_bs_local.html"-->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_footer_bs.html"-->
+</body>
+
+</html>

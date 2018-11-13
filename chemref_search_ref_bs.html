@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- chemref_search_ref_bs.html - 22-Apr-2017 jdw -->
+
+<head>
+    <!--#include virtual="/chem_ref_data_ui/includes/head_common_bs_local.html"-->
+    <title>Chemical Reference Data Management Module</title>
+</head>
+
+<body>
+    <div id="wrap">
+        <!--#include virtual="/chem_ref_data_ui/includes/page_header_bs.html"-->
+        <div class="container">
+            <div class="page-header">
+                <h3>Chemical Reference Data <small>Search Tasks</small>      <small id="span_identifier" class="pull-right displaynone"> </small></h3>
+            </div>
+            <p>
+                The form below provides search options for BIRD and chemical component reference definitions. </p>
+            <!-- Full search -->
+            <div id="chemref-full-search-dialog" title="Chemical Reference Data Full Search Dialog">
+                <form id="chemref-full-search-form" method="post" action="#" class="form-inline">
+                    <fieldset>
+                        <legend>Chemical Reference Data Search
+                            <a href="chemref_help_bs.html#searchOptions"> <span class="glyphicon glyphicon-info-sign pull-right"></span> </a>
+                        </legend>
+                        <div class="form-group ">
+                            <label for="searchType1" class="control-label">Search items</label>
+                            <select class="form-control" name="searchType" id="searchType1">
+                                <option value="CCD_CC_ID,CCD_CC_ID|CCD_ENTITY|MULTI_VALUE_WS|EQUAL,LIKE" selected="selected">CC ID</option>
+                                <option value="CCD_NAME,CCD_NAME|CCD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">Chemical component name</option>
+                                <option value="CCD_SYNONYM,CCD_SYNONYM|CCD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">Chemical component synonym</option>
+                                <option value="CCD_NAME_OR_SYNONYM,CCD_NAME_OR_SYNONYM|CCD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">Chemical Component Name or Synonym</option>
+                                <!-- <option value="CCD_CC_ID|CCD_ENTITY|MULTI_VALUE_WS|LIKE">Chemical component ID 3-letter code</option> -->
+                                <option value="CCD_SUBCOMPONENTS|CCD_ENTITY|SINGLE_VALUE|LIKE">Chemical component subcomponent sequence (3-letter codes)</option>
+                                <!-- <option value="CCD_FORMULA|CCD_ENTITY|SINGLE_VALUE|LIKE">Chemical Component Formula</option> -->
+                                <option value="CCD_FORMULA_WEIGHT|CCD_ENTITY|RANGE_VALUE_PAIR|BETWEEN">Chemical component formula weight (range)</option>
+                                <option disabled>_________________________________________</option>
+                                <option value="CCDINST_CC_ID_PUBLIC,CCDINST_CC_ID_INTERNAL|CCD_INSTANCE|MULTI_VALUE_WS|EQUAL">Chemical component instances in public and internal entries (CC_ID)</option>
+                                <option value="CCDINST_CC_ID_PUBLIC|CCD_INSTANCE|MULTI_VALUE_WS|EQUAL">Chemical component instances in public entries (CC_ID)</option>
+                                <option value="CCDINST_CC_ID_INTERNAL|CCD_INSTANCE|MULTI_VALUE_WS|EQUAL">Chemical component in internal entries (CC_ID)</option>
+                                <option disabled>_________________________________________</option>
+                                <option value="CCDIDX_FORMULA_SUBSET|INDEX_FORMULA_SUBSET|SINGLE_VALUE|COMPUTED">Formula subset</option>
+                                <option value="CCDIDX_FORMULA_EXACT|INDEX_FORMULA_EXACT|SINGLE_VALUE|COMPUTED">Formula exact</option>
+                                <option value="CCDIDX_FORMULA_HEAVY_ATOM_EXACT|INDEX_FORMULA_EXACT_SKIPH|SINGLE_VALUE|COMPUTED">Formula heavy atom exact</option>
+                                <option value="CCDIDX_FORMULA_BOUNDED|INDEX_FORMULA_BOUNDED|SINGLE_VALUE|COMPUTED">Formula bounded subset</option>
+                                <option value="CCDIDX_FORMULA_WEIGHT_RANGE|INDEX_MATCH_RANGE_VALUE_PAIR|SINGLE_VALUE|COMPUTED">Formula weight (range)</option>
+                                <option value="CCDIDX_SIMILAR_NAME|INDEX_MATCH_SIMILAR|SINGLE_VALUE|SIMILAR">Similar name or synonym </option>
+                                <option value="CCDIDX_SUBCOMPONENT_SUBSET|INDEX_MATCH_SUBSTRING|SINGLE_VALUE|LIKE">Subcomponent subset</option>
+                                <option value="CCDIDX_SUBCOMPONENTS|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">Subcomponents</option>
+                                <option value="CCDIDX_SMILES|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">SMILES</option>
+                                <option value="CCDIDX_SMILES_STEREO|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">SMILES STEREO</option>
+                                <option value="CCDIDX_INCHI|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">Standard InChI</option>
+                                <option value="CCDIDX_INCHIKEY|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">InChI Key</option>
+                                <option value="CCDIDX_INCHIKEY14|INDEX_MATCH_EXACT|SINGLE_VALUE|EXACT">InChI Key (14)</option>
+                                <option disabled>_________________________________________</option>
+                                <option value="BIRD_PRD_ID,BIRD_PRD_ID|BIRD_ENTITY|MULTI_VALUE_WS|EQUAL,LIKE">BIRD PRD_ID</option>
+                                <option value="BIRD_FAMILY_ID,BIRD_FAMILY_ID|BIRD_ENTITY|MULTI_VALUE_WS|EQUAL,LIKE">BIRD PRD family identifier (FAM_ID) </option>
+                                <option value="BIRD_NAME,BIRD_NAME|BIRD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">BIRD entity name</option>
+                                <option value="BIRD_SYNONYM,BIRD_SYNONYM|BIRD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">BIRD entity synonym</option>
+                                <option value="BIRD_NAME_OR_SYNONYM,BIRD_NAME_OR_SYNONYM|BIRD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">BIRD entity name or synonym</option>
+                                <option value="BIRD_CC_ID|BIRD_ENTITY|MULTI_VALUE_WS|LIKE">BIRD chemical component ID 3-letter code</option>
+                                <option value="BIRD_SOURCE_ORGANISM_NAME|BIRD_ENTITY|SINGLE_VALUE|LIKE">BIRD source organism scientific name</option>
+                                <option value="BIRD_SEQ_THREE_LETTER_CODE|BIRD_ENTITY|SINGLE_VALUE|LIKE">BIRD polymer sequence (3-letter codes)</option>
+                                <option value="BIRD_SEQ_ONE_LETTER_CODE|BIRD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">BIRD polymer sequence (1-letter-codes)</option>
+                                <option value="BIRD_SUBCOMPONENTS|BIRD_ENTITY|SINGLE_VALUE|EQUAL,LIKE">BIRD subcomponent sequence (3-letter codes)</option>
+                                <option value="BIRD_FORMULA|BIRD_ENTITY|SINGLE_VALUE|LIKE">BIRD formula</option>
+                                <option value="BIRD_CLASS|BIRD_ENTITY|SINGLE_VALUE|LIKE">BIRD class - functional class</option>
+                                <option value="BIRD_TYPE|BIRD_ENTITY|SINGLE_VALUE|LIKE">BIRD type- structural class</option>
+                                <option disabled>_________________________________________</option>
+                                <option value="BIRDINST_PRD_ID_PUBLIC,BIRDINST_PRD_ID_INTERNAL|BIRD_INSTANCE|MULTI_VALUE_WS|EQUAL">BIRD instances in public and internal entries (PRD_ID)</option>
+                                <option value="BIRDINST_PRD_ID_PUBLIC|BIRD_INSTANCE|MULTI_VALUE_WS|EQUAL">BIRD instances in public enties (PRD_ID)</option>
+                                <option value="BIRDINST_PRD_ID_INTERNAL|BIRD_INSTANCE|MULTI_VALUE_WS|EQUAL">BIRD instances in internal entries (PRD_ID)</option>
+                            </select>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <label for="searchOp1" class="control-label">Search type</label>
+                            <select class="form-control" name="searchOp" id="searchOp1">
+                                <option selected="selected" value="LIKE">Substring</option>
+                                <option value="EXACT">Exact</option>
+                            </select>
+                        </div>
+                        -->
+                        <div class="form-group ">
+                            <input class="form-control " type="text" autocomplete="off" name="searchTarget" id="searchTarget1" value="" placeholder="Search Target " style="width: 600px;" />
+                        </div>
+                        <input name="searchTitle" TYPE="hidden" VALUE="Search Results" />
+                        <input name="searchOp" TYPE="hidden" VALUE="unknown" />
+                        <input id="chemref-full-search-button" class="btn btn-primary" TYPE="submit" VALUE="Go" />
+                        <input class="btn btn-primary" type="reset" value="Reset">
+                        <button type="button" class="btn btn-info pull-right" data-target="div.results-section" data-dismiss="alert">Clear Results</button>
+                    </fieldset>
+                    <div class="row" style="margin-top:5px">
+                        <div id="chemref-full-search-status" class="op-status col-lg-3 offset-lg-3"></div>
+                    </div>
+                </form>
+            </div>
+            <br />
+            <div id="chemref-search-results-container" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Search Results</div>
+                </div>
+                <!-- <div id="search-content" class="search-results"></div> -->
+            </div>
+            <br />
+            <div id="chemref-report-results-container" class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Reports</div>
+                </div>
+                <div id="report-content" class="report-content"></div>
+            </div>
+            <!-- END TEXT HERE  -->
+            <!-- progress spinner -->
+            <div id="loading">
+                <div id="loadingcontent">
+                    <p id="loadingspinner">
+                        Running ...
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- end of chem-ref-search-dialog -->
+    </div>
+    <!--  end container -->
+    </div>
+    <!-- end wrap -->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_javascript_bs_local.html"-->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_footer_bs.html"-->
+</body>
+
+</html>
