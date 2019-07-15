@@ -1,0 +1,154 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Editor (%(instanceid)s) - Chemical Component Editor</title>
+
+<link rel="stylesheet" type="text/css" media="all" href="/ccmodule/styles/general.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/ccmodule/styles/oneColLiqCtrHdr.css" />
+<link rel="stylesheet" type="text/css" media="all" href="/ccmodule/styles/superfish.css" />
+
+<link href="/ccmodule/editor/css/ui.jqgrid.css" rel="stylesheet" type="text/css"/> 
+<link href="/ccmodule/editor/css/redmond/jquery-ui-1.8.2.custom.css" rel="stylesheet" type="text/css"/>
+<link href="/ccmodule/editor/css/jquery.windows-engine.css" rel="stylesheet" type="text/css"/>
+<link href="/ccmodule/editor/css/chemdiagram.css" rel="stylesheet" type="text/css"/>
+
+
+<script type="text/javascript" src="/js/jquery-10.2/core/jquery-1.10.2.min.js"></script>
+<!--[if IE]><script type="text/javascript" src="/ccmodule/editor/excanvas.js"></script><![endif]-->
+<script type="text/javascript" src="/ccmodule/editor/canvas.text.js"></script>
+<script type="text/javascript" src="/ccmodule/editor/faces/optimer-normal-normal.js"></script>            
+
+<script type="text/javascript" src="/ccmodule/editor/js/jquery.jqGrid.min.js"></script>
+<script type="text/javascript" src="/ccmodule/editor/js/jquery.cookie.js"></script>  
+<script type="text/javascript" src="/ccmodule/editor/js/jquery.json-2.2.js"></script>      
+<script type="text/javascript" src="/ccmodule/editor/js/jquery.windows-engine.js"></script>           
+<script type="text/javascript" src="/ccmodule/editor/js/jquery.ajaxfileupload.js"></script>
+
+<script type="text/javascript" src="/applets/jmol-dev/jsmol/JSmol.min.nojq.js"></script>
+<script type="text/javascript" src="/ccmodule/editor/js/Jmol2.js"></script>
+    
+<script type="text/javascript" src="/ccmodule/editor/jquery.chem.js"></script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.chemFormats.js"></script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.chemUI.js"></script>
+
+<script type="text/javascript" src="/ccmodule/editor/jquery.objectEdit.js"> </script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.chemViews.js"> </script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.chemAjax.js"> </script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.chemWin.js"> </script>
+<script type="text/javascript" src="/ccmodule/editor/jquery.cifEdit.js"> </script>
+
+<style type="text/css">
+       .ui-jqgrid-title, .ui-jqgrid-sortable, .ui-jqgrid-btable {font-size:13px;font-family:Sans-serif}
+       .ui-jqgrid-btable {border:solid 1px gray}
+       input[type="text"] {background:white;font-family:"Courier New",Courier,monospace;font-size:12px;
+                           color:black;border-bottom:solid 1px #AAAAAA;border-right:solid 1px #AAAAAA;}
+       table td {text-align:left;}
+</style>
+
+
+<script type='text/javascript'>
+$(document).ready(function() {
+        jQuery.chemPath="/ccmodule/editor/";
+        jQuery.cifEdit.sessionId  = '%(sessionid)s';
+        jQuery.cifEdit.instanceId = '%(instanceid)s';
+        jQuery.cifEdit.identifier = '';
+        jQuery.cifEdit.pdbId = '';
+        jQuery.cifEdit.annotator = '';
+        jQuery.cifEdit.processing_site = '%(processing_site)s';
+        jQuery.cifEdit.ccModuleFlag = true;
+        var instanceId  = '%(instanceid)s';
+        var cifUrl = '%(urlcifpath)s';
+
+        $('#chemWin').chemWin({
+           edit:{posx:2,posy:135,width:800},
+           comp:{posy:135,posx:805,width:400,height:500},
+           jmol:{title:'3-D ideal',posy:680,posx:605,height:440,width:600},
+           jmolm:{title:'3-D model',posy:680,posx:2,height:440,width:600},
+           showJmolm:true,           
+           atoms:{posx:2,posy:1165,width:1200,height:200},
+           bonds:{posx:2,posy:1410,width:1200,height:200},
+           audit:{posx:2,posy:1655,width:1200,height:200},
+           file:{posx:2,posy:1900,width:1200,height:150}, 
+           synonym:{posx:2,posy:2095,width:1200,height:200},
+           related:{posx:2,posy:2340,width:1200,height:200},
+           view:{compModel:jQuery.cifEdit.compCompModel,
+                 atomModel:jQuery.cifEdit.compAtomModel,
+                 bondModel:jQuery.cifEdit.compBondModel,
+                 auditModel:jQuery.cifEdit.compAuditModel,
+                 synonymModel:jQuery.cifEdit.compSynonymModel,
+                 relatedModel:jQuery.cifEdit.compRelatedModel,
+                 hydrogensjmm:false,
+                 hydrogensjm:false,
+                 jmolMode:'3di',
+                 defaultFileFormat:'mmCif'},
+           control:{load:false,upload:false,align2d:true,addhydro:true,align3d:false,reset:true},            
+           afterLoad:jQuery.cifEdit.newCodeAssigned('chemWin'),
+           afterInit:function() {
+              jQuery.chemViews.cifEditControls('chemWin',{Update:true,CheckDuplicate:true,Audit:false,SetParent:true,CommittoCVS:true});
+              jQuery.chemWin.loadCifUrl('chemWin',cifUrl,instanceId);
+              $('#chemWinLoading').hide();
+              $('#help_link').html('<span style="display:inline;" class="ui-icon ui-icon-info">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
+              var wnds=["Edit","Comp","Jmolm","Jmol","Atoms","Bonds","Audit","File","Synonym","Related"];
+              var wpos={Jmolm:"top",Jmol:"top"};
+              var wwdth={Comp:300,Jmolm:300,Jmol:300};
+              var iconWinFocus=function(wm){
+                       return function() {
+                       $('#chem'+wm+'_chemWin_window .window-titleBar-content').mousedown();
+                       $('#chem'+wm+'_chemWin_window .window-titleBar-content').mouseup();
+                     }};
+              for(var wi=0;wi<wnds.length;wi++) {
+                  var wnm=wnds[wi];
+                  $('#chem'+wnm+'_chemWin_window .window-titleBar-content').append('<span id="help_link_'+wnm+'" class="ui-icon ui-icon-info fltrgt"></span>');
+                  $('#help_link_'+wnm+'').click(iconWinFocus(wnm));
+              }
+              $.getScript('/js/jquery/plugins-src/jquery.bt.v097.min.js', function() {
+                $('#help_link').bt({positions: ['left', 'bottom'],ajaxPath: '/ccmodule/cc_edit_help.html div#summary', ajaxOpts:{dataType:'html'},trigger: 'click', 
+                                    width: 600,centerPointX: .9,spikeLength: 20,spikeGirth: 10,padding: 15,cornerRadius: 25,
+                                    fill: '#FFF', strokeStyle: '#ABABAB',strokeWidth: 1});
+                  for(var wi=0;wi<wnds.length;wi++) {
+                      var wnm=wnds[wi];
+                      var wp=wpos[wnm];
+                      if(!wp) wp="left";
+                      var ww=wwdth[wnm];
+                      if(!ww) ww=600;
+                      $('#help_link_'+wnm).bt({positions: [wp],ajaxPath: '/ccmodule/cc_edit_help.html div#'+wnm, ajaxOpts:{dataType:'html'},trigger: 'click', 
+                                         width: ww,centerPointX: .9,spikeLength: 20,spikeGirth: 10,padding: 15,cornerRadius: 25,
+                                         fill: '#FFF', strokeStyle: '#ABABAB',strokeWidth: 1});
+                  }       
+             });
+           }
+      });
+});
+</script>
+</head>
+<body class="oneColLiqCtrHdr">
+<div id="container">
+<!-- begin #header-->
+	<div id="header">
+    	<div id="logo"><img src="/images/wwpdb_logo.gif" width="187" height="58" alt="logo" /> </div>
+    	<div id="headerCont">
+      		<h1>Chemical Component Editor<br/><span style="font-size:18px"> Editor (CC ID: %(instanceid)s)</span></h1>
+		</div>
+    	<br class="clearfloat" /> 
+	</div>
+<!-- #header ends above-->
+<!-- begin #menu bar -->
+<!-- #menu ends above -->
+    <br class="clearfloat" />
+<!-- #mainContent begins -->
+
+    <div id="chemWin"></div>
+    <div id="chemWinLoading" style="margin-top:30px;margin-left:30px;font-size:30px">Loading ...</div>
+
+<!-- #mainContent ends above -->
+<!-- #footer begins -->
+	<br/>
+	<div style="margin-top:2455px" id="footer">
+   		<p>&copy; 2019 wwPDB Chemical Component Editor</p>
+	</div>
+<!-- #footer ends above -->
+</div>
+<!-- #container ends above-->
+</body>
+</html>

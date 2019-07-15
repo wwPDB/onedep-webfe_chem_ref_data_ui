@@ -32,6 +32,7 @@ var chemrefAdminOpsUrl = '/service/chemref/adminops';
 var chemrefIdOpsUrl = '/service/chemref/inline_idops';
 var chemrefFileOpsUrl = '/service/chemref/inline_fileops';
 var chemrefFullSearchUrl = '/service/chemref/search';
+var chemrefEditorUrl = '/service/chemref/editor';
 var newSessionServiceUrl = '/service/chemref/newsession';
 var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
@@ -792,6 +793,31 @@ $(document).ready(function() {
             }
         });
 
+    }
+
+    // -- chemref editor --
+    if ($("#chemref-editor-dialog").length > 0) {
+        $('#chemref-editor-form').ajaxForm({
+            url: chemrefEditorUrl,
+            dataType: 'json',
+            success: function(jsonObj) {
+                progressEnd();
+                $('#chemref-editor-button').show();
+                updateCompletionStatus(jsonObj, '#chemref-editor-form');
+                if (('location' in jsonObj) && (jsonObj.location != "")) {
+                    window.open(jsonObj.location, '_blank');
+                }
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-editor-form div.op-status').hide();
+                progressStart();
+                $('#chemref-editor-button').hide();
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+            }
+        });
     }
 
     <!-- Download task operations -->

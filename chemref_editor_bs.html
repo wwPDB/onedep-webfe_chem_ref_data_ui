@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!--#include virtual="/chem_ref_data_ui/includes/head_common_bs_local.html"-->
+    <title>Chemical Reference Data Management Module</title>
+</head>
+
+<body>
+    <div id="wrap">
+        <!--#include virtual="/chem_ref_data_ui/includes/page_header_bs.html"-->
+        <div class="container">
+            <div class="page-header">
+                <h3>Chemical Component <small>Editor</small>       <small id="span_identifier" class="pull-right displaynone"> </small></h3>
+            </div>
+            <p>Please input the CC ID to edit existing chemical component definitions.</p>
+            <div id="chemref-editor-dialog">
+                <form id="chemref-editor-form" method="get" action="/service/chemref/editor" enctype="application/x-www-form-urlencoded" name="chemref-editor" class="form-inline">
+                    <fieldset>
+                        <div class="form-group">
+                            <label for="chemref-idcode-1" class="control-label">CC ID:</label>
+                            <input type="text" name="idcode" id="chemref-idcode-1" value="" placeholder="CC ID" class="form-control" />
+                        </div>
+                        <input id="chemref-editor-button" class="btn btn-primary" TYPE="submit" VALUE="Load" />
+                        <input class="btn btn-primary" type="reset" value="Reset" />
+                        <div id="chemref-editor-status" class="op-status"></div>
+                        <div id="chemref-editor-links" class="op-links"></div>
+                    </fieldset>
+                </form>
+
+                <!-- END TEXT HERE  -->
+                <!-- progress spinner -->
+                <div id="loading">
+                    <div id="loadingcontent">
+                        <p id="loadingspinner">
+                            Running ...
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- end chemref editor dialog -->
+        </div>
+        <!--  end container -->
+    </div>
+    <!-- end wrap -->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_javascript_bs_local.html"-->
+    <!--#include virtual="/chem_ref_data_ui/includes/page_footer_bs.html"-->
+</body>
+
+</html>
