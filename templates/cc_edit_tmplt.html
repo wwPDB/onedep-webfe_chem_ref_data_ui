@@ -57,6 +57,7 @@ $(document).ready(function() {
         jQuery.cifEdit.annotator = '';
         jQuery.cifEdit.processing_site = '%(processing_site)s';
         jQuery.cifEdit.ccModuleFlag = true;
+        jQuery.cifEdit.existingCCFlag = 'yes';
         var instanceId  = '%(instanceid)s';
         var cifUrl = '%(urlcifpath)s';
 
@@ -73,7 +74,7 @@ $(document).ready(function() {
            synonym:{posx:2,posy:2095,width:1200,height:200},
            related:{posx:2,posy:2340,width:1200,height:200},
            relatedatom:{posx:2,posy:2585,width:1200,height:200},
-           view:{compModel:jQuery.cifEdit.compCompModel,
+           view:{compModel:jQuery.cifEdit.%(ccmodel)s,
                  atomModel:jQuery.cifEdit.compAtomModel,
                  bondModel:jQuery.cifEdit.compBondModel,
                  auditModel:jQuery.cifEdit.compAuditModel,
