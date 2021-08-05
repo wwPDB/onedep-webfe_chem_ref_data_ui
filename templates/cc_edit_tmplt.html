@@ -49,6 +49,7 @@
 
 
 <script type='text/javascript'>
+var contentSize = 0;
 $(document).ready(function() {
         jQuery.chemPath="/ccmodule/editor/";
         jQuery.cifEdit.sessionId  = '%(sessionid)s';
@@ -108,6 +109,22 @@ $(document).ready(function() {
                   $('#chem'+wnm+'_chemWin_window .window-titleBar-content').append('<span id="help_link_'+wnm+'" class="ui-icon ui-icon-info fltrgt"></span>');
                   $('#help_link_'+wnm+'').click(iconWinFocus(wnm));
               }
+            
+              if ($('#chemRelatedAtom_chemWin_window').length) {
+                contentSize += $('#chemRelatedAtom_chemWin_window').position().top +
+                $('#chemRelatedAtom_chemWin_window').height() +
+                $('.window-titleBar').height() +
+                $('.window-statusBar').height() + 10;
+
+                $('#footerToolbar').css('top', contentSize + 'px');
+                $('#footer').css('margin-top', contentSize + 'px');
+              } else {
+                // if we don't find the RelatedAtom window, instead of placing the
+                // button relative to the windows, we place it relative to the top
+                // of the page, as it is done with the footer itself
+                $('#footerToolbar').css('margin-top', '2650px');
+              }
+
               $.getScript('/js/jquery/plugins-src/jquery.bt.v097.min.js', function() {
                 $('#help_link').bt({positions: ['left', 'bottom'],ajaxPath: '/ccmodule/cc_edit_help.html div#summary', ajaxOpts:{dataType:'html'},trigger: 'click', 
                                     width: 600,centerPointX: .9,spikeLength: 20,spikeGirth: 10,padding: 15,cornerRadius: 25,
@@ -150,6 +167,7 @@ $(document).ready(function() {
 <!-- #mainContent ends above -->
 <!-- #footer begins -->
 	<br/>
+    <div style="position: absolute; left:2px;" id="footerToolbar"></div>
 	<div style="margin-top:2700px" id="footer">
    		<p>&copy; 2019 wwPDB Chemical Component Editor</p>
 	</div>
