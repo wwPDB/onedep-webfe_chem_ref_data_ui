@@ -280,7 +280,9 @@ function appendContextToMenuUrls() {
 }
 
 function assignContext(jsonObj) {
-    sessionId = jsonObj.sessionid;
+    if ("sessionid" in jsonObj) {
+        sessionId = jsonObj.sessionid;
+    }
     //  message  =jsonObj.htmlcontent;
     errorFlag = jsonObj.errorflag;
     errorText = jsonObj.errortext;
