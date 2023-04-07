@@ -122,8 +122,9 @@ function makeNglView(idCode, webXyzPath, xyzType) {
     document.body.appendChild(tooltip);
     //
     stage.setSize("600px", "600px");
-    stage.loadFile(webXyzPath).then(function(o) {
-        o.addRepresentation("licorice", { sele: xyzSelId, multipleBond: "symmetric", color: "element" });
+    stage.loadFile(webXyzPath, {defaultRepresentation: true}).then(function(o) {
+        //o.addRepresentation("licorice", { sele: xyzSelId, multipleBond: "symmetric", color: "element" });
+        o.addRepresentation("label", { labelType: "atomname", xOffset: 0.2, yOffset: 0.2, zOffset: 0.5 });
         stage.autoView();
         //var pa = o.structure.getPrincipalAxes();
         //stage.animationControls.rotate(pa.getRotationQuaternion(), 1500);
