@@ -36,6 +36,9 @@ var chemrefEditorUrl = '/service/chemref/editor';
 var newSessionServiceUrl = '/service/chemref/newsession';
 var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
+var nglReportsIndex = 0;
+var nglRepresentations = [];
+var nglLabelRepresentations = [];
 
 (function() {
     var b, d, c = this,
@@ -81,6 +84,12 @@ function updateNglViews(jsonObj) {
     }
 }
 
+function clearNglGlobalVars(){
+	nglReportsIndex = 0;
+	nglRepresentations.length = 0;
+	nglLabelRepresentations.length = 0;
+}
+
 function makeNglView(idCode, webXyzPath, xyzType) {
     //logContext("launchNgl webPath is " + webXyzPath);
     //logContext("launchNgl idCode  is " + idCode);
@@ -123,8 +132,24 @@ function makeNglView(idCode, webXyzPath, xyzType) {
     //
     stage.setSize("600px", "600px");
     stage.loadFile(webXyzPath, {defaultRepresentation: true}).then(function(o) {
-        //o.addRepresentation("licorice", { sele: xyzSelId, multipleBond: "symmetric", color: "element" });
-        o.addRepresentation("label", { labelType: "atomname", xOffset: 0.2, yOffset: 0.2, zOffset: 0.5 });
+	nglRepresentations.push(o);
+        //licorice = o.addRepresentation("licorice", { sele: xyzSelId, multipleBond: "symmetric", color: "element" });
+	//licorice.setVisibility(true);
+	l = o.addRepresentation("label", { labelType: "atomname", color: "black", fontWeight: "bold", xOffset: 0.1, yOffset: 0.1, radius: 1.4 });
+	l.setVisibility(false);
+	nglLabelRepresentations.push(l);
+	cb = document.getElementsByClassName('nglReportLabelsCheckbox')[nglReportsIndex];
+	if(cb){
+		cb.addEventListener("change", () => {t=window.event.target;c=document.getElementsByClassName('nglReportLabelsCheckbox');index=0;for(x=0;x<c.length;++x){if(c[x]==window.event.target){index=x;break;}};l=nglLabelRepresentations[index];v = l.visible;l.setVisibility(!v);});
+	} else {
+		console.log('error - labels checkbox did not load');
+	}
+	o.setSelection('not _H');
+	h = document.getElementsByClassName('nglReportHydrogensCheckbox')[nglReportsIndex];
+        if(h){
+		h.addEventListener("change", () => {t=window.event.target;c=document.getElementsByClassName('nglReportHydrogensCheckbox');index=0;for(x=0;x<c.length;++x){if(c[x]==window.event.target){index=x;break;}};r=nglRepresentations[index];sele='not _H';if(c[x].checked){sele='*';};r.setSelection(sele);});
+        }
+	nglReportsIndex++;
         stage.autoView();
         //var pa = o.structure.getPrincipalAxes();
         //stage.animationControls.rotate(pa.getRotationQuaternion(), 1500);
@@ -152,7 +177,7 @@ function makeNglView(idCode, webXyzPath, xyzType) {
         }
     });
     //
-    var selId = "div.ngl-class-" + xyzType + "-" + idCode
+    var selId = "div.ngl-class-" + xyzType + "-" + idCode;
     $(selId).visibilityChanged({
         callback: function(element, visible) {
             // do something here
