@@ -74,11 +74,11 @@ function updateNglViews(jsonObj) {
             //logContext("launchNgl idCode  is " + idCodeList[i]);
             nglId = "#" + idCodeList[i]+"_ngl_expt"
             if ($(nglId).length) {
-                makeNglView(idCodeList[i], webPathList[i], 'expt');
+                makeJsMolView(idCodeList[i], webPathList[i], 'expt');
             }
             nglId = "#" + idCodeList[i]+"_ngl_ideal"
             if ($(nglId).length) {
-                makeNglView(idCodeList[i], webPathList[i], 'ideal');
+                makeJsMolView(idCodeList[i], webPathList[i], 'ideal');
             }
         }
     }
@@ -90,9 +90,41 @@ function clearNglGlobalVars(){
 	nglLabelRepresentations.length = 0;
 }
 
+function makeJsMolView(search_val, webXyzPath, xyzType){
+    //let views = [];
+    //window.onload = () => {
+    //  document.querySelector('#search').addEventListener('change', function () {
+    //    let textinput = window.event.target;
+    //    let search_val = textinput.value;
+        let container = `${search_val}_ngl_${xyzType}`;
+    //    let ideal_container = `${search_val}_ideal`;
+        //document.getElementById(container).innerHTML = `
+        //<div id="${expt_container}" style="float:left;"></div>
+        //<div id="${ideal_container}" style="float:left;"></div>
+        //`;
+        //views.push(
+        view = new Viewer(
+                        container,
+                        search_val,
+                        xyzType,
+                        `${search_val} ${xyzType} coordinates`,
+                        645,
+                        645,
+                        'assets/js/j2s'
+                )
+        //);
+        view.initialize();
+        //for(let x = 0;x < views.length;++x){
+        //  views[x].initialize();
+        //}
+    //  });
+    //}
+}
+
 function makeNglView(idCode, webXyzPath, xyzType) {
-    //logContext("launchNgl webPath is " + webXyzPath);
-    //logContext("launchNgl idCode  is " + idCode);
+    logContext("idCode  is " + idCode);
+    logContext("webXyzPath is " + webXyzPath);
+    logContext("xyzType is " + xyzType);
     // maintain graphics context in displayed reports
     //var globalNglObj = {};
     var nglId;
