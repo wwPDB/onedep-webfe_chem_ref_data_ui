@@ -85,17 +85,20 @@ function updateNglViews(jsonObj) {
 }
 
 function makeJsMolView(search_val, webXyzPath, xyzType){
+   logContext("idCode  is " + search_val);
+   logContext("webXyzPath is " + webXyzPath);
+   logContext("xyzType is " + xyzType);
    let container = `${search_val}_ngl_${xyzType}`;
    view = new Viewer(
                    container,
                    search_val,
+                   webXyzPath,
                    xyzType,
                    `${search_val} ${xyzType} coordinates`,
                    645,
                    645,
                    'assets/js/j2s'
            )
-   view.initialize();
 }
 
 function makeNglView(idCode, webXyzPath, xyzType) {

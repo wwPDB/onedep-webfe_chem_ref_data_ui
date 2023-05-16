@@ -1,12 +1,14 @@
 class Viewer {
-    constructor(parent_id, search_val, expt_or_ideal, title, width, height, j2s_path){
+    constructor(parent_id, search_val, webXyzPath, expt_or_ideal, title, width, height, j2s_path){
         this.parent_id = parent_id;
         this.search_val = search_val;
+	this.webXyzPath = webXyzPath;
         this.expt_or_ideal = expt_or_ideal.toLowerCase();
         this.title = title;
         this.width = width;
         this.height = height;
         this.j2s_path = j2s_path;
+        this.search_with = "path"; // or search_val
         this.model = `${search_val}_${expt_or_ideal}_model`;
         this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_container`;
         document.getElementById(this.parent_id).innerHTML = `
@@ -46,10 +48,14 @@ class Viewer {
             j2sPath:this.j2s_path,
             use: 'HTML5'
         };
-        // this.initialize();
+        this.initialize();
     }
     initialize(){
-        this.searchMol(this.search_val);
+        if(this.search_with == "path"){
+           this.searchMol(this.webXyzPath);
+        } else {
+           this.searchMol(this.search_val);
+        }
         let boxes = document.getElementById(this.parent_id).getElementsByClassName("hydrogens");
         for(let x = 0;x < boxes.length;++x)
         {
@@ -119,9 +125,17 @@ class Viewer {
     searchMol(accession) {
         Jmol.getApplet(this.model, this.JmolInfo);
         if(this.expt_or_ideal.toLowerCase() == 'expt') {
-            Jmol.script(eval(this.model), `load "==${accession}" FILTER "NOIDEAL"`);
+            if(this.search_with == "path"){
+               Jmol.script(eval(this.model), `load ${accession} FILTER "NOIDEAL"`);
+            } else {
+               Jmol.script(eval(this.model), `load "==${accession}" FILTER "NOIDEAL"`);
+            }
         } else {
-            Jmol.script(eval(this.model), `load "==${accession}"`);
+            if(this.search_with == "path"){
+               Jmol.script(eval(this.model), `load ${accession}`);
+            } else {
+               Jmol.script(eval(this.model), `load "==${accession}"`);
+            }
         }
         Jmol.script(eval(this.model), 'hide _H');
         Jmol.script(eval(this.model), 'labels OFF');
@@ -156,7 +170,7 @@ class Viewer {
     toggleBackground(checked) {
         let myJmol = this.model;
         if(checked) {
-            Jmol.script(eval(myJmol), 'background black');
+            Jmol.script(eval(myJmol), 'background "#AAAAAA"');
         } else {
             Jmol.script(eval(myJmol), 'background "#E2F4F5"');
         }
