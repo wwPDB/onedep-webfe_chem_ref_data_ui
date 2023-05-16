@@ -13,7 +13,7 @@ class Viewer {
         this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_container`;
         document.getElementById(this.parent_id).innerHTML = `
 <div style="width:${this.width - 10}px;height:${this.height - 10}px;" class="container jsmol_search_result_table">
-    <div class="row">
+    <div class="row" style="padding:5px;">
         <label style="padding-left:5px;">${this.title}</label>
         <div class="dropdown" style="position:relative;z-index:10;display:inline-block;float:right;padding-right:5px;">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
@@ -60,6 +60,7 @@ class Viewer {
         for(let x = 0;x < boxes.length;++x)
         {
             boxes[x].addEventListener('click', function () {
+		window.event.stopPropagation();
                 let box = window.event.target;
                 let span = box.getElementsByTagName('span')[0];
                 let checked;
@@ -76,6 +77,7 @@ class Viewer {
         boxes = document.getElementById(this.parent_id).getElementsByClassName("labels");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
+		window.event.stopPropagation();
                 let box = window.event.target;
                 let span = box.getElementsByTagName('span')[0];
                 let checked;
@@ -92,6 +94,7 @@ class Viewer {
         boxes = document.getElementById(this.parent_id).getElementsByClassName("foreground");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
+		window.event.stopPropagation();
                 let box = window.event.target;
                 let span = box.getElementsByTagName('span')[0];
                 let checked;
@@ -108,6 +111,7 @@ class Viewer {
         boxes = document.getElementById(this.parent_id).getElementsByClassName("background");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
+		window.event.stopPropagation();
                 let box = window.event.target;
                 let span = box.getElementsByTagName('span')[0];
                 let checked;
