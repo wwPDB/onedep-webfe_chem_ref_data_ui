@@ -10,31 +10,34 @@ class Viewer {
         this.model = `${search_val}_${expt_or_ideal}_model`;
         this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_container`;
         document.getElementById(this.parent_id).innerHTML = `
-<table style="width:${this.width - 10}px;height:${this.height - 10}px;" class="jsmol_search_result_table">
-<tr>
-<td>
-    <label style="padding-left:5px;">${this.title}</label>
-    <form class="dropdown" style="position:relative;z-index:10;display:inline-block;float:right;padding-right:5px;">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-            <span>
-                <i class="fas fa-bars fa-1x"></i>
-            </span>
-        </button>
-        <ul class="dropdown-menu">
-            <li><input type="checkbox" class="hydrogens"><label class="hydrogens">hydrogens</label></li>
-            <li><input type="checkbox" class="labels"><label class="labels">labels</label></li>
-            <li><input type="checkbox" class="foreground"><label class="foreground">foreground</label></li>
-            <li><input type="checkbox" class="background"><label class="background">background</label></li>
-        </ul>
-    </form>
-</td>
-</tr>
-<tr>
-<td>
-    <div id="${this.model_container_id}" style="position:relative;z-index:1;"></div>
-</td>
-</tr>
-</table>
+<div style="width:${this.width - 10}px;height:${this.height - 10}px;" class="container jsmol_search_result_table">
+    <div class="row">
+        <label style="padding-left:5px;">${this.title}</label>
+        <div class="dropdown" style="position:relative;z-index:10;display:inline-block;float:right;padding-right:5px;">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <span>
+                    <i class="fas fa-bars fa-1x"></i>
+                </span>
+            </button>
+            <ul class="dropdown-menu">
+                <li class="hydrogens">
+                    <a>hydrogens<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+                <li class="labels">
+                    <a>labels<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+                <li class="foreground">
+                    <a>foreground<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+                <li class="background">
+                    <a>background<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div id="${this.model_container_id}" style="position:relative;z-index:1;" class="row">
+    </div>
+</div>
 `;
         this.JmolInfo = {
             width:this.width - 10,
@@ -52,60 +55,64 @@ class Viewer {
         {
             boxes[x].addEventListener('click', function () {
                 let box = window.event.target;
-                if (box.nodeName.toLowerCase() == 'label') {
-                    box = box.parentNode.firstChild;
-                    if (!box.getAttribute('checked')) {
-                        box.setAttribute('checked', 'checked');
-                    } else {
-                        box.removeAttribute('checked');
-                    }
+                let span = box.getElementsByTagName('span')[0];
+                let checked;
+                if(span.style.visibility == 'hidden'){
+                    span.style.visibility = 'visible';
+                    checked = true;
+                } else if(span.style.visibility == 'visible'){
+                    span.style.visibility = 'hidden';
+                    checked = false;
                 }
-                this.toggleHydrogens(box.checked);
+                this.toggleHydrogens(checked);
             }.bind(this));
         }
         boxes = document.getElementById(this.parent_id).getElementsByClassName("labels");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
                 let box = window.event.target;
-                if(box.nodeName.toLowerCase() == 'label'){
-                    box = box.parentNode.firstChild;
-                    if(! box.getAttribute('checked')) {
-                        box.setAttribute('checked', 'checked');
-                    } else {
-                        box.removeAttribute('checked');
-                    }
+                let span = box.getElementsByTagName('span')[0];
+                let checked;
+                if(span.style.visibility == 'hidden'){
+                    span.style.visibility = 'visible';
+                    checked = true;
+                } else if(span.style.visibility == 'visible'){
+                    span.style.visibility = 'hidden';
+                    checked = false;
                 }
-                this.toggleLabels(box.checked);
+                this.toggleLabels(checked);
             }.bind(this));
         }
         boxes = document.getElementById(this.parent_id).getElementsByClassName("foreground");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
                 let box = window.event.target;
-                if(box.nodeName.toLowerCase() == 'label'){
-                    box = box.parentNode.firstChild;
-                    if(! box.getAttribute('checked')) {
-                        box.setAttribute('checked', 'checked');
-                    } else {
-                        box.removeAttribute('checked');
-                    }
+                let span = box.getElementsByTagName('span')[0];
+                let checked;
+                if(span.style.visibility == 'hidden'){
+                    span.style.visibility = 'visible';
+                    checked = true;
+                } else if(span.style.visibility == 'visible'){
+                    span.style.visibility = 'hidden';
+                    checked = false;
                 }
-                this.toggleForeground(box.checked);
+                this.toggleForeground(checked);
             }.bind(this));
         }
         boxes = document.getElementById(this.parent_id).getElementsByClassName("background");
         for(let x = 0;x < boxes.length;++x) {
             boxes[x].addEventListener('click', function () {
                 let box = window.event.target;
-                if(box.nodeName.toLowerCase() == 'label'){
-                    box = box.parentNode.firstChild;
-                    if(! box.getAttribute('checked')) {
-                        box.setAttribute('checked', 'checked');
-                    } else {
-                        box.removeAttribute('checked');
-                    }
+                let span = box.getElementsByTagName('span')[0];
+                let checked;
+                if(span.style.visibility == 'hidden'){
+                    span.style.visibility = 'visible';
+                    checked = true;
+                } else if(span.style.visibility == 'visible'){
+                    span.style.visibility = 'hidden';
+                    checked = false;
                 }
-                this.toggleBackground(box.checked);
+                this.toggleBackground(checked);
             }.bind(this));
         }
     }
@@ -120,11 +127,6 @@ class Viewer {
         Jmol.script(eval(this.model), 'labels OFF');
         // insert model
         document.querySelector(`#${this.model_container_id}`).innerHTML = Jmol.getAppletHtml(eval(this.model));
-        // reset all
-        let boxes = document.querySelectorAll('input[type="checkbox"]');
-        for(let x = 0;x < boxes.length;++x) {
-            boxes[x].removeAttribute('checked');
-        }
     };
     toggleHydrogens(checked) {
         let myJmol = this.model;

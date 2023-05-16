@@ -84,41 +84,18 @@ function updateNglViews(jsonObj) {
     }
 }
 
-function clearNglGlobalVars(){
-	nglReportsIndex = 0;
-	nglRepresentations.length = 0;
-	nglLabelRepresentations.length = 0;
-}
-
 function makeJsMolView(search_val, webXyzPath, xyzType){
-    //let views = [];
-    //window.onload = () => {
-    //  document.querySelector('#search').addEventListener('change', function () {
-    //    let textinput = window.event.target;
-    //    let search_val = textinput.value;
-        let container = `${search_val}_ngl_${xyzType}`;
-    //    let ideal_container = `${search_val}_ideal`;
-        //document.getElementById(container).innerHTML = `
-        //<div id="${expt_container}" style="float:left;"></div>
-        //<div id="${ideal_container}" style="float:left;"></div>
-        //`;
-        //views.push(
-        view = new Viewer(
-                        container,
-                        search_val,
-                        xyzType,
-                        `${search_val} ${xyzType} coordinates`,
-                        645,
-                        645,
-                        'assets/js/j2s'
-                )
-        //);
-        view.initialize();
-        //for(let x = 0;x < views.length;++x){
-        //  views[x].initialize();
-        //}
-    //  });
-    //}
+   let container = `${search_val}_ngl_${xyzType}`;
+   view = new Viewer(
+                   container,
+                   search_val,
+                   xyzType,
+                   `${search_val} ${xyzType} coordinates`,
+                   645,
+                   645,
+                   'assets/js/j2s'
+           )
+   view.initialize();
 }
 
 function makeNglView(idCode, webXyzPath, xyzType) {
