@@ -263,21 +263,25 @@ class Viewer {
     toggleWireframe(checked) {
         let myJmol = this.model;
         if(checked) {
+	    let reset = "wireframe reset;spacefill reset;";
+	    Jmol.script(eval(this.model), reset);
 	    let wireframe = "wireframe on;wireframe 0.10;";
 	    Jmol.script(eval(this.model), wireframe);
         } else {
-	    let wireframe = "wireframe reset;";
-	    Jmol.script(eval(this.model), wireframe);
+	    let reset = "wireframe reset;";
+	    Jmol.script(eval(this.model), reset);
         }
     }
     toggleSpacefill(checked) {
         let myJmol = this.model;
         if(checked) {
+	    let reset = "wireframe reset;spacefill reset;";
+	    Jmol.script(eval(this.model), reset);
 	    let wireframe = "wireframe on;wireframe 0.10;spacefill off;";
 	    Jmol.script(eval(this.model), wireframe);
         } else {
-	    let wireframe = "wireframe reset;spacefill reset;";
-	    Jmol.script(eval(this.model), wireframe);
+	    let reset = "wireframe reset;spacefill reset;";
+	    Jmol.script(eval(this.model), reset);
         }
     }
 }
