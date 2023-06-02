@@ -64,15 +64,36 @@ function logContext(message) {
     log("%log: " + message);
 }
 
+function set3dEventListener(jsonObj){
+    if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
+        var webPathList = jsonObj.webPathList.toString().split(",");
+        var idCodeList = jsonObj.idCodeList.toString().split(",");
+        for (var i = 0; i < webPathList.length; i++) {
+            nglId = "ngl-section-" + idCodeList[i].toUpperCase();
+	    if(document.getElementsByClassName(nglId)){
+	         let a = document.getElementsByClassName(nglId)[0];
+		 if(a){
+		    a.addEventListener("click", function(){
+	               updateNglViews(jsonObj);
+	            }.bind(jsonObj));
+		 } else {
+		    console.log("anchor not found");
+		 }
+	    } else {
+	        console.log(`${nglId} not found`);
+	    }
+	}
+    }
+}
+
 function updateNglViews(jsonObj) {
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
-        var idCode;
         for (var i = 0; i < webPathList.length; i++) {
             //logContext("launchNgl webPath is " + webPathList[i]);
             //logContext("launchNgl idCode  is " + idCodeList[i]);
-            nglId = "#" + idCodeList[i]+"_ngl_expt"
+            nglId = "#" + idCodeList[i]+"_ngl_expt";
             if ($(nglId).length) {
                 makeJsMolView(idCodeList[i], webPathList[i], 'expt');
             }
@@ -89,12 +110,16 @@ function makeJsMolView(search_val, webXyzPath, xyzType){
    logContext("webXyzPath is " + webXyzPath);
    logContext("xyzType is " + xyzType);
    let container = `${search_val}_ngl_${xyzType}`;
+   let expt_or_ideal = xyzType;
+   if(expt_or_ideal == 'expt'){
+      expt_or_ideal = 'experimental';
+   }
    view = new Viewer(
                    container,
                    search_val,
                    webXyzPath,
                    xyzType,
-                   `${search_val} ${xyzType} coordinates`,
+                   `${search_val} ${expt_or_ideal} coordinates`,
                    645,
                    645,
                    'assets/js/j2s'
@@ -433,7 +458,8 @@ function updateReportContent(jsonObj, contentId) {
         });
     }
     // Activate 3D views
-    updateNglViews(jsonObj);
+    // updateNglViews(jsonObj);
+    set3dEventListener(jsonObj);
 }
 
 function updateLinkContent(jsonObj, contentId) {
