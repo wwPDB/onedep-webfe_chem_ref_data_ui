@@ -64,17 +64,21 @@ function logContext(message) {
     log("%log: " + message);
 }
 
-function set3dEventListener(jsonObj){
+function set3dEventListener(jsonObj, tab_name){
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
         for (var i = 0; i < webPathList.length; i++) {
-            nglId = "ngl-section-" + idCodeList[i].toUpperCase();
+            let app_name = 'ataglance';
+	    if(tab_name == '3d'){
+               app_name = 'ngl';
+            }
+            nglId = `${app_name}-section-` + idCodeList[i].toUpperCase();
 	    if(document.getElementsByClassName(nglId)){
 	         let a = document.getElementsByClassName(nglId)[0];
 		 if(a){
 		    a.addEventListener("click", function(){
-	               updateNglViews(jsonObj);
+	               updateNglViews(jsonObj, tab_name);
 	            }.bind(jsonObj));
 		 } else {
 		    console.log("anchor not found");
@@ -86,33 +90,47 @@ function set3dEventListener(jsonObj){
     }
 }
 
-function updateNglViews(jsonObj) {
+function updateNglViews(jsonObj, tab_name) {
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
         for (var i = 0; i < webPathList.length; i++) {
             //logContext("launchNgl webPath is " + webPathList[i]);
             //logContext("launchNgl idCode  is " + idCodeList[i]);
-            nglId = "#" + idCodeList[i]+"_ngl_expt";
+            if(tab_name == '3d'){
+                nglId = "#" + idCodeList[i]+"_ngl_expt";
+                if ($(nglId).length) {
+                    makeJsMolView(idCodeList[i], webPathList[i], 'expt', tab_name);
+                }
+	    }
+	    let app_name = 'ataglance';
+	    if(tab_name == '3d'){
+	       app_name = 'ngl';
+	    }
+            nglId = "#" + idCodeList[i]+`_${app_name}_ideal`
             if ($(nglId).length) {
-                makeJsMolView(idCodeList[i], webPathList[i], 'expt');
-            }
-            nglId = "#" + idCodeList[i]+"_ngl_ideal"
-            if ($(nglId).length) {
-                makeJsMolView(idCodeList[i], webPathList[i], 'ideal');
+                makeJsMolView(idCodeList[i], webPathList[i], 'ideal', tab_name);
             }
         }
     }
 }
 
-function makeJsMolView(search_val, webXyzPath, xyzType){
+function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    logContext("idCode  is " + search_val);
    logContext("webXyzPath is " + webXyzPath);
    logContext("xyzType is " + xyzType);
-   let container = `${search_val}_ngl_${xyzType}`;
+   let app_name = 'ataglance';
+   if(tab_name == '3d'){
+      app_name = 'ngl';
+   }
+   let container = `${search_val}_${app_name}_${xyzType}`;
    let expt_or_ideal = xyzType;
    if(expt_or_ideal == 'expt'){
       expt_or_ideal = 'experimental';
+   }
+   let width_height = 645;
+   if(tab_name == 'ataglance'){
+      width_height = 500;
    }
    view = new Viewer(
                    container,
@@ -120,9 +138,10 @@ function makeJsMolView(search_val, webXyzPath, xyzType){
                    webXyzPath,
                    xyzType,
                    `${search_val} ${expt_or_ideal} coordinates`,
-                   645,
-                   645,
-                   'assets/js/j2s'
+                   width_height,
+                   width_height,
+                   'assets/js/j2s',
+		   tab_name
            )
 }
 
@@ -149,7 +168,7 @@ function makeNglView(idCode, webXyzPath, xyzType) {
     if ($(nglId).length) {
         logContext("Skip missing ngl pane for " + nglId);
         return true
-}
+    }
     //
     var stage = new NGL.Stage(nglId, { backgroundColor: "white" });
     //globalNglObj[nglId] = stage;
@@ -459,7 +478,8 @@ function updateReportContent(jsonObj, contentId) {
     }
     // Activate 3D views
     // updateNglViews(jsonObj);
-    set3dEventListener(jsonObj);
+    set3dEventListener(jsonObj, '3d');
+    set3dEventListener(jsonObj, 'ataglance');
 }
 
 function updateLinkContent(jsonObj, contentId) {

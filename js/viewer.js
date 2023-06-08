@@ -1,5 +1,5 @@
 class Viewer {
-    constructor(parent_id, search_val, webXyzPath, expt_or_ideal, title, width, height, j2s_path){
+    constructor(parent_id, search_val, webXyzPath, expt_or_ideal, title, width, height, j2s_path, tab_name){
         this.parent_id = parent_id;
         this.search_val = search_val;
 	this.webXyzPath = webXyzPath;
@@ -8,16 +8,17 @@ class Viewer {
         this.width = width;
         this.height = height;
         this.j2s_path = j2s_path;
+	this.tab_name = tab_name;
 
 	// options: path or search_val
 	// path = search with file path
 	// search_val = search with value entered
         this.search_with = "path"; 
 
-        this.model = `${search_val}_${expt_or_ideal}_model`;
-        this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_container`;
+        this.model = `${search_val}_${expt_or_ideal}_${tab_name}_model`;
+        this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_${tab_name}_container`;
 	this.default_background = "white";
-	this.alt_background = "#E2F4F5";
+	this.alt_background = "#DDDDDD"; // "#E2F4F5";
 	this.default_foreground = "black";
 	this.menu_background = "hsl(0,0%,80%)";
 	this.menu_border = "hsl(0,0%,70%)";
@@ -30,7 +31,7 @@ class Viewer {
 	this.menu_icon = "images/icons8-hamburger-menu-50.png";
 
         document.getElementById(this.parent_id).innerHTML = `
-<div style="width:${this.width - 10}px;height:${this.height - 10}px;" class="container jsmol_search_result_table">
+<div style="width:${this.width - 10}px;height:${this.height - 10}px;background-color:white;" class="container jsmol_search_result_table">
     <div class="row" style="padding:5px;">
         <label style="padding-left:5px;">${this.title}</label>
         <div class="dropdown" style="position:relative;z-index:10;display:inline-block;float:right;padding-right:5px;">
@@ -39,7 +40,7 @@ class Viewer {
 		    <img src="${this.menu_icon}" style="width:${this.menu_width};height:${this.menu_height};">
                 </span>
             </button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu dropdown-menu-right">
                 <li class="jsmol-hydrogens">
                     <a>hydrogens<span style="float:right;visibility:hidden;">&check;</span></a>
                 </li>
@@ -99,7 +100,7 @@ class Viewer {
             } else {
                Jmol.script(eval(this.model), `load "==${accession}" FILTER "NOIDEAL"`);
             }
-        } else {
+        } else if(this.expt_or_ideal.toLowerCase() == 'ideal'){
             if(this.search_with == "path"){
                Jmol.script(eval(this.model), `load ${accession};`);
             } else {
@@ -112,6 +113,15 @@ class Viewer {
         //document.querySelector(`#${this.model_container_id}`).innerHTML = Jmol.getAppletHtml(eval(this.model));
 	this.resetLarge();
     };
+    resetSmall(){
+	    let reset = "wireframe reset;spacefill reset;";
+	    Jmol.script(eval(this.model), reset);
+    }
+    resetLarge(){
+	    this.resetSmall();
+	    let wireframe = "wireframe on;wireframe 0.10;spacefill 0.30;";
+	    Jmol.script(eval(this.model), wireframe);
+    }
     initializeComponents(){
         let boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-hydrogens");
         for(let x = 0;x < boxes.length;++x)
@@ -167,8 +177,8 @@ class Viewer {
                     checked = false;
                 }
                 this.toggleAtomLabels(checked);
-		let sibling = span.parentNode.parentNode.previousElementSibling;
-		sibling.getElementsByTagName('span')[0].style.visibility = 'hidden';
+		//let sibling = span.parentNode.parentNode.previousElementSibling;
+		//sibling.getElementsByTagName('span')[0].style.visibility = 'hidden';
             }.bind(this));
         }
         boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-foreground");
@@ -233,7 +243,7 @@ class Viewer {
             Jmol.script(eval(myJmol), 'hide _H');
         }
     }
-    toggleIndexLabels(checked) {
+    /** toggleIndexLabels(checked) {
         let myJmol = this.model;
         if(checked) {
             // %a, %e, %i
@@ -241,7 +251,7 @@ class Viewer {
         } else {
             Jmol.script(eval(myJmol), 'labels OFF');
         }
-    }
+    } **/
     toggleAtomLabels(checked) {
         let myJmol = this.model;
         if(checked) {
@@ -266,15 +276,6 @@ class Viewer {
         } else {
             Jmol.script(eval(myJmol), `background "${this.default_background}"`);
         }
-    }
-    resetSmall(){
-	    let reset = "wireframe reset;spacefill reset;";
-	    Jmol.script(eval(this.model), reset);
-    }
-    resetLarge(){
-	    this.resetSmall();
-	    let wireframe = "wireframe on;wireframe 0.10;spacefill 0.30;";
-	    Jmol.script(eval(this.model), wireframe);
     }
     toggleWireframe(checked) {
         let myJmol = this.model;
