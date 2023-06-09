@@ -587,7 +587,13 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                 */
             });
             logContext("Displaying " + resultSetContainerId)
-            $(resultSetContainerId).show();
+	    // restrict to exact results only
+	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
+	    if(simSearch.find('i').text() == 'like'){
+	        simSearch.hide();
+	    } else { // not necessary
+                $("#" + resultSetContainerId).show();
+	    }
         }
     } else {
         logContext(" No table data in object ")
