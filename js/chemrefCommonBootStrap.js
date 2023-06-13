@@ -80,6 +80,10 @@ function set3dEventListener(jsonObj, tab_name){
 		    a.addEventListener("click", function(){
 	               updateNglViews(jsonObj, tab_name);
 	            }.bind(jsonObj));
+		    if(app_name == 'ataglance'){
+		       // expand results
+		       a.click();
+		    }
 		 } else {
 		    console.log("anchor not found");
 		 }
@@ -132,6 +136,8 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    if(tab_name == 'ataglance'){
       width_height = 500;
    }
+   j2s_path = 'assets/js/j2s';
+   //j2s_path = '../../assets/applets/jmol-latest/jsmol/j2s';
    view = new Viewer(
                    container,
                    search_val,
@@ -140,7 +146,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
                    `${search_val} ${expt_or_ideal} coordinates`,
                    width_height,
                    width_height,
-                   'assets/js/j2s',
+                   j2s_path,
 		   tab_name
            )
 }
@@ -590,9 +596,13 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 	    // restrict to exact results only
 	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
 	    if(simSearch.find('i').text() == 'like'){
+		// hide similarity results
 	        simSearch.hide();
-	    } else { // not necessary
-                $("#" + resultSetContainerId).show();
+	    } else { 
+		// expand exact results
+		$(contentId).find(".chevron").parent().click();
+		$(contentId).find(".app-ref-report").click();
+                //$("#" + resultSetContainerId).show();
 	    }
         }
     } else {
