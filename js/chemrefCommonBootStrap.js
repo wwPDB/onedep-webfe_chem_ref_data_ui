@@ -40,6 +40,8 @@ var nglReportsIndex = 0;
 var nglRepresentations = [];
 var nglLabelRepresentations = [];
 
+var CLOSED_REPORT_SECTIONS = [];
+
 (function() {
     var b, d, c = this,
         a = c.console;
@@ -81,7 +83,7 @@ function set3dEventListener(jsonObj, tab_name){
 	               updateNglViews(jsonObj, tab_name);
 	            }.bind(jsonObj));
 		    if(app_name == 'ataglance'){
-		       // expand results
+		       // expand results on first viewing
 		       a.click();
 		    }
 		 } else {
@@ -120,9 +122,9 @@ function updateNglViews(jsonObj, tab_name) {
 }
 
 function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
-   logContext("idCode  is " + search_val);
-   logContext("webXyzPath is " + webXyzPath);
-   logContext("xyzType is " + xyzType);
+   logContext("idCode " + search_val);
+   logContext("webXyzPath " + webXyzPath);
+   logContext("xyzType " + xyzType);
    let app_name = 'ataglance';
    if(tab_name == '3d'){
       app_name = 'ngl';
@@ -481,11 +483,11 @@ function updateReportContent(jsonObj, contentId) {
             $($(this).attr("data-target")).toggleClass('active');
              }
         });
+        // Activate 3D views
+        // updateNglViews(jsonObj);
+        set3dEventListener(jsonObj, '3d');
+        set3dEventListener(jsonObj, 'ataglance');
     }
-    // Activate 3D views
-    // updateNglViews(jsonObj);
-    set3dEventListener(jsonObj, '3d');
-    set3dEventListener(jsonObj, 'ataglance');
 }
 
 function updateLinkContent(jsonObj, contentId) {
@@ -504,6 +506,16 @@ function updateLinkContent(jsonObj, contentId) {
     }
 }
 
+function closeReportSection(){
+	var trgt = window.event.target.parentNode.parentNode;
+	var attr = trgt.getAttribute("data-target");
+	logContext("closing " + attr);
+	var trgt = attr.split("_")[0];
+	trgt = trgt.substring(1);
+	logContext("closed " + trgt);
+	CLOSED_REPORT_SECTIONS.push(trgt);
+	logContext(CLOSED_REPORT_SECTIONS.toString());
+}
 
 function assignReportOp(selector) {
     $(selector).unbind("click").on("click", function(e) {
@@ -531,8 +543,17 @@ function assignReportOp(selector) {
             success: function(jsonObj) {
                 //logContext("Report operation completed");
                 // updateLinkContent(jsonObj,   '#chemref-inline-idops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
-                assignReportOp("a.app-ref-report");
+                if('idCodeList' in jsonObj){
+			for(let x = 0;x < jsonObj.idCodeList.length;x++){
+				if(CLOSED_REPORT_SECTIONS.indexOf(jsonObj.idCodeList[x]) >= 0){
+					jsonObj.idCodeList.splice(x, 1);
+				}
+			}
+			if(jsonObj.idCodeList.length > 0){
+                		updateReportContent(jsonObj, '#chemref-report-results-container');
+                		assignReportOp("a.app-ref-report");
+			}
+		}
             }
         });
     });
@@ -599,9 +620,11 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 		// hide similarity results
 	        simSearch.hide();
 	    } else { 
-		// expand exact results
-		$(contentId).find(".chevron").parent().click();
+		// expand exact results, keep chevron closed for readability
+		//chevron = $(contentId).find(".chevron").parent();
+		//chevron.click();
 		$(contentId).find(".app-ref-report").click();
+                //not necessary
                 //$("#" + resultSetContainerId).show();
 	    }
         }
