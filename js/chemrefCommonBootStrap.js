@@ -39,6 +39,7 @@ var pagePath = '';
 var nglReportsIndex = 0;
 var nglRepresentations = [];
 var nglLabelRepresentations = [];
+var MAX_OPEN_REPORTS = 10;
 var CLOSED_REPORT_SECTIONS = [];
 
 (function() {
@@ -142,9 +143,16 @@ $(document).ready(function() {
                 });
             },
             select: function(event, ui) {
-                /* console.log(ui.item ? ("Selected: " + ui.item.value + " aka " + ui.item.id) : "Nothing selected, input was " + this.value); */
+                /** console.log(ui.item ? ("Selected: " + ui.item.value + " aka " + ui.item.id) : "Nothing selected, input was " + this.value); **/ 
             }
         });
+
+	$("#searchTarget1").keyup(function(evt){
+		var searchTarget = evt.target.value;
+		if(searchTarget.indexOf(',') >= 0){
+			document.getElementById("searchTarget1").value = searchTarget.replace(",", " ");
+		}
+	});
 
         <!-- chemref reference entity search form -->
         $('#chemref-full-search-form').ajaxForm({
@@ -175,8 +183,10 @@ $(document).ready(function() {
                     "name": "sessionid",
                     "value": sessionId
                 });
+
             }
         });
+
     }
 
     // -- WORKING COLLECTION OF ADMIN FUNCTIONS --
@@ -378,7 +388,7 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 		// expand exact results, keep chevron closed for readability
 		//chevron = $(contentId).find(".chevron").parent();
 		//chevron.click();
-		$(contentId).find(".app-ref-report").click();
+		$(contentId).find(".app-ref-report").slice(0,MAX_OPEN_REPORTS).click();
 	    }
 
             logContext("Displaying " + resultSetContainerId)
@@ -520,25 +530,29 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    if(tab_name == '3d'){
       app_name = 'ngl';
    }
-   let container = `${search_val}_${app_name}_${xyzType}`;
+   let container_name = `${search_val}_${app_name}_${xyzType}`;
    let expt_or_ideal = xyzType;
    if(expt_or_ideal == 'expt'){
       expt_or_ideal = 'experimental';
    }
-   let width_height = 645;
-   if(tab_name == 'ataglance'){
-      width_height = 500;
-   }
+   let container = document.getElementById(container_name);
+   let width = container.style.width.replace("px", "");
+   let height = container.style.height.replace("px", "");
+   let padding = container.style.padding.replace("px", "");
+   let margin = container.style.margin.replace("px", "");
+   let border = container.style.borderWidth.replace("px", "");
+   width = Number(width) - Number(padding) - Number(margin) - Number(border);
+   height = Number(height) - Number(padding) - Number(margin) - Number(border) - 3;
    j2s_path = 'assets/js/j2s';
    //j2s_path = '../../assets/applets/jmol-latest/jsmol/j2s';
    view = new Viewer(
-                   container,
+                   container_name,
                    search_val,
                    webXyzPath,
                    xyzType,
                    `${search_val} ${expt_or_ideal} coordinates`,
-                   width_height,
-                   width_height,
+                   width,
+                   height,
                    j2s_path,
 		   tab_name
            )
