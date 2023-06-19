@@ -543,8 +543,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    let border = container.style.borderWidth.replace("px", "");
    width = Number(width) - Number(padding) - Number(margin) - Number(border);
    height = Number(height) - Number(padding) - Number(margin) - Number(border) - 3;
-   j2s_path = 'assets/js/j2s';
-   //j2s_path = '../../assets/applets/jmol-latest/jsmol/j2s';
+   j2s_path = '/assets/js/JSmol-16.1.11/j2s';
    view = new Viewer(
                    container_name,
                    search_val,

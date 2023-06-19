@@ -60,6 +60,8 @@ class Viewer {
                     <a>wireframe<span style="float:right;visibility:hidden;">&check;</span></a>
                 </li>
             </ul>
+	    <!-- not appearing in Safari -->
+	    <!--<input type="color" id="${this.model_container_id}_color" style="visibility:hidden;width:0px;height:0px;padding:0px;margin:0px;border:0px;position:absolute;z-index:100;margin-left:-300px;">-->
         </div>
     </div>
     <div id="${this.model_container_id}" style="position:relative;z-index:1;" class="row">
@@ -231,6 +233,20 @@ class Viewer {
             Jmol.script(eval(myJmol), 'color labels cpk');
         }
     }
+    /**toggleBackground(checked){
+	let myJmol = this.model;
+	if(checked){
+		let picker = document.getElementById(`${this.model_container_id}_color`);
+		picker.click();
+		picker.addEventListener("change", function(){
+			let color = window.event.target.value;
+			let myJmol = this.model;
+			Jmol.script(eval(myJmol), `background "${color}"`);
+		}.bind(this));
+	} else {
+		Jmol.script(eval(myJmol), `background "${this.default_background}"`);
+	}
+    }**/
     toggleBackground(checked) {
         let myJmol = this.model;
         if(checked) {
