@@ -37,7 +37,9 @@ class Viewer {
 <div style="width:${this.width}px;height:${this.height}px;background-color:white;" class="container jsmol_search_result_table">
     <div class="row">
         <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
-        <div class="dropdown" style="position:relative;z-index:10;display:inline-block;float:right;padding-right:${this.menu_right_padding}px;">
+	<div style="display:inline-flex;float:right;">
+	<input type="color" value="#ffffff" id="${this.model_container_id}_color" style="visibility:hidden;padding:0px;margin:0px;border:0px;";>
+        <div class="dropdown" style="position:relative;z-index:10;display:inline-block;padding-right:${this.menu_right_padding}px;">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="background-color:${this.menu_background};padding:${this.menu_button_padding}px;border-color:${this.menu_border};">
                 <span>
 		    <img src="${this.menu_icon}" style="width:${this.menu_width}px;height:${this.menu_height}px;">
@@ -60,9 +62,8 @@ class Viewer {
                     <a>wireframe<span style="float:right;visibility:hidden;">&check;</span></a>
                 </li>
             </ul>
-	    <!-- not appearing in Safari -->
-	    <!--<input type="color" id="${this.model_container_id}_color" style="visibility:hidden;width:0px;height:0px;padding:0px;margin:0px;border:0px;position:absolute;z-index:100;margin-left:-300px;">-->
         </div>
+	</div>
     </div>
     <div id="${this.model_container_id}" style="position:relative;z-index:1;" class="row">
     </div>
@@ -233,12 +234,12 @@ class Viewer {
             Jmol.script(eval(myJmol), 'color labels cpk');
         }
     }
-    /**toggleBackground(checked){
+    toggleBackground(checked){
 	let myJmol = this.model;
 	if(checked){
-		let picker = document.getElementById(`${this.model_container_id}_color`);
-		picker.click();
-		picker.addEventListener("change", function(){
+		let selector = document.getElementById(`${this.model_container_id}_color`);
+		selector.click();
+		selector.addEventListener("change", function(){
 			let color = window.event.target.value;
 			let myJmol = this.model;
 			Jmol.script(eval(myJmol), `background "${color}"`);
@@ -246,15 +247,15 @@ class Viewer {
 	} else {
 		Jmol.script(eval(myJmol), `background "${this.default_background}"`);
 	}
-    }**/
-    toggleBackground(checked) {
+    }
+    /**toggleBackground(checked) {
         let myJmol = this.model;
         if(checked) {
             Jmol.script(eval(myJmol), `background "${this.alt_background}"`);
         } else {
             Jmol.script(eval(myJmol), `background "${this.default_background}"`);
         }
-    }
+    }**/
     toggleWireframe(checked) {
         let myJmol = this.model;
         if(checked) {
