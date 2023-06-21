@@ -18,7 +18,7 @@ class Viewer {
         this.model = `${search_val}_${expt_or_ideal}_${tab_name}_model`;
         this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_${tab_name}_container`;
 	this.default_background = "white";
-	this.alt_background = "#DDDDDD"; // "#E2F4F5";
+	this.alt_background = "#DDDDDD"; 
 	this.default_foreground = "black";
 	this.menu_background = "hsl(0,0%,80%)";
 	this.menu_border = "hsl(0,0%,70%)";

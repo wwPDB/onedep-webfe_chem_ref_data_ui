@@ -12,6 +12,7 @@
  *    14-Jun-2017 jdw toggle tabs - diminish jump scrolling behavior -
  *    14-Jun-2017 jdw fix report and search section visibility on empty
  *    18-Jun-2017 jdw relace DOMSubtreeModified with MutationObserver -
+ *    Jun-2023 james smith replace ngl with jsmol
  *
  * if ( $.trim( $('#leftmenu').text() ) == "")
  *  $('#leftMenuWrapper').remove();
@@ -36,11 +37,7 @@ var chemrefEditorUrl = '/service/chemref/editor';
 var newSessionServiceUrl = '/service/chemref/newsession';
 var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
-var nglReportsIndex = 0;
-var nglRepresentations = [];
-var nglLabelRepresentations = [];
 var MAX_OPEN_REPORTS = 10;
-var CLOSED_REPORT_SECTIONS = [];
 
 (function() {
     var b, d, c = this,
@@ -147,6 +144,7 @@ $(document).ready(function() {
             }
         });
 
+	// enable comma separated lists by replacing commas with blanks (otherwise app adds extra commas)
 	$("#searchTarget1").keyup(function(evt){
 		var searchTarget = evt.target.value;
 		if(searchTarget.indexOf(',') >= 0){
@@ -371,7 +369,7 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 	    // restrict to exact results only
 	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
 	    let stdSearchTargetList = simSearch.find('span.stdSearchTargetList').text();
-	    logContext("found " + stdSearchTargetList);
+	    logContext("processing " + stdSearchTargetList);
 	    
 	    if(simSearch.find('i').text() == 'like'){
 		// hide similarity results
@@ -385,9 +383,10 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                         assignReportOp("a.app-ref-report");
                     },
                 });
-		// expand exact results, keep chevron closed for readability
-		//chevron = $(contentId).find(".chevron").parent();
-		//chevron.click();
+		// expand exact results, restrict to 10
+		// keep chevron closed for readability
+		// chevron = $(contentId).find(".chevron").parent();
+		// chevron.click();
 		$(contentId).find(".app-ref-report").slice(0,MAX_OPEN_REPORTS).click();
 	    }
 
@@ -461,7 +460,6 @@ function updateReportContent(jsonObj, contentId) {
              }
         });
         // Activate 3D views
-        // updateNglViews(jsonObj);
         set3dEventListener(jsonObj, '3d');
         set3dEventListener(jsonObj, 'ataglance');
     }
@@ -474,14 +472,14 @@ function set3dEventListener(jsonObj, tab_name){
         for (var i = 0; i < webPathList.length; i++) {
             let app_name = 'ataglance';
 	    if(tab_name == '3d'){
-               app_name = 'ngl';
+               app_name = 'jsmol';
             }
-            nglId = `${app_name}-section-` + idCodeList[i].toUpperCase();
-	    if(document.getElementsByClassName(nglId)){
-	         let a = document.getElementsByClassName(nglId)[0];
+            jsmolId = `${app_name}-section-` + idCodeList[i].toUpperCase();
+	    if(document.getElementsByClassName(jsmolId)){
+	         let a = document.getElementsByClassName(jsmolId)[0];
 		 if(a){
 		    a.addEventListener("click", function(){
-	               updateNglViews(jsonObj, tab_name);
+	               updateJsmolViews(jsonObj, tab_name);
 	            }.bind(jsonObj));
 		    if(app_name == 'ataglance'){
 		       // expand results on first viewing
@@ -491,31 +489,31 @@ function set3dEventListener(jsonObj, tab_name){
 		    console.log("anchor not found");
 		 }
 	    } else {
-	        console.log(`${nglId} not found`);
+	        console.log(`${jsmolId} not found`);
 	    }
 	}
     }
 }
 
-function updateNglViews(jsonObj, tab_name) {
+function updateJsmolViews(jsonObj, tab_name) {
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
         for (var i = 0; i < webPathList.length; i++) {
-            //logContext("launchNgl webPath is " + webPathList[i]);
-            //logContext("launchNgl idCode  is " + idCodeList[i]);
+            //logContext("launchJsmol webPath is " + webPathList[i]);
+            //logContext("launchJsmol idCode  is " + idCodeList[i]);
             if(tab_name == '3d'){
-                nglId = "#" + idCodeList[i]+"_ngl_expt";
-                if ($(nglId).length) {
+                jsmolId = "#" + idCodeList[i]+"_jsmol_expt";
+                if ($(jsmolId).length) {
                     makeJsMolView(idCodeList[i], webPathList[i], 'expt', tab_name);
                 }
 	    }
 	    let app_name = 'ataglance';
 	    if(tab_name == '3d'){
-	       app_name = 'ngl';
+	       app_name = 'jsmol';
 	    }
-            nglId = "#" + idCodeList[i]+`_${app_name}_ideal`
-            if ($(nglId).length) {
+            jsmolId = "#" + idCodeList[i]+`_${app_name}_ideal`
+            if ($(jsmolId).length) {
                 makeJsMolView(idCodeList[i], webPathList[i], 'ideal', tab_name);
             }
         }
@@ -528,7 +526,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    logContext("xyzType " + xyzType);
    let app_name = 'ataglance';
    if(tab_name == '3d'){
-      app_name = 'ngl';
+      app_name = 'jsmol';
    }
    let container_name = `${search_val}_${app_name}_${xyzType}`;
    let expt_or_ideal = xyzType;
@@ -541,8 +539,9 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    let padding = container.style.padding.replace("px", "");
    let margin = container.style.margin.replace("px", "");
    let border = container.style.borderWidth.replace("px", "");
+   let adjustment = 3;
    width = Number(width) - Number(padding) - Number(margin) - Number(border);
-   height = Number(height) - Number(padding) - Number(margin) - Number(border) - 3;
+   height = Number(height) - Number(padding) - Number(margin) - Number(border) - adjustment;
    j2s_path = '/assets/js/JSmol-16.1.11/j2s';
    view = new Viewer(
                    container_name,
@@ -555,16 +554,6 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
                    j2s_path,
 		   tab_name
            )
-}
-
-function closeReportSection(){
-	// not used
-	var trgt = window.event.target.parentNode.parentNode;
-	var attr = trgt.getAttribute("data-target");
-	var trgt = attr.split("_")[0];
-	trgt = trgt.substring(1);
-	CLOSED_REPORT_SECTIONS.push(trgt);
-	logContext("closed " + CLOSED_REPORT_SECTIONS.toString());
 }
 
 function setDownloadFileUrl(id) {
