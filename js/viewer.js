@@ -15,8 +15,9 @@ class Viewer {
 	// search_val = search with value entered
         this.search_with = "path"; 
 
-        this.model = `${search_val}_${expt_or_ideal}_${tab_name}_model`;
-        this.model_container_id = `${this.search_val}_${this.expt_or_ideal}_${tab_name}_container`;
+        this.model = `model_${search_val}_${expt_or_ideal}_${tab_name}`;
+        this.model_container_id = `${this.model}_container`;
+	this.color_selector_id = `${this.model}_color`;
 	this.default_background = "white";
 	this.alt_background = "#DDDDDD"; 
 	this.default_foreground = "black";
@@ -38,7 +39,7 @@ class Viewer {
     <div class="row">
         <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
 	<div style="display:inline-flex;float:right;">
-	<input type="color" value="#ffffff" id="${this.model_container_id}_color" style="visibility:hidden;padding:0px;margin:0px;border:0px;";>
+	<input type="color" value="#ffffff" id="${this.color_selector_id}" style="visibility:hidden;padding:0px;margin:0px;border:0px;";>
         <div class="dropdown" style="position:relative;z-index:10;display:inline-block;padding-right:${this.menu_right_padding}px;">
             <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="background-color:${this.menu_background};padding:${this.menu_button_padding}px;border-color:${this.menu_border};">
                 <span>
@@ -122,13 +123,13 @@ class Viewer {
 	    Jmol.script(eval(this.model), wireframe);
     }
     initializeComponents(){
-        let boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-hydrogens");
-        for(let x = 0;x < boxes.length;++x)
+        let options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-hydrogens");
+        for(let x = 0;x < options.length;++x)
         {
-            boxes[x].addEventListener('click', function () {
+            options[x].addEventListener('click', function () {
 		window.event.stopPropagation();
-                let box = window.event.target;
-                let span = box.getElementsByTagName('span')[0];
+                let option = window.event.target;
+                let span = option.getElementsByTagName('span')[0];
                 let checked;
                 if(span.style.visibility == 'hidden'){
                     span.style.visibility = 'visible';
@@ -140,12 +141,12 @@ class Viewer {
                 this.toggleHydrogens(checked);
             }.bind(this));
         }
-        boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-atom-labels");
-        for(let x = 0;x < boxes.length;++x) {
-            boxes[x].addEventListener('click', function () {
+        options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-atom-labels");
+        for(let x = 0;x < options.length;++x) {
+            options[x].addEventListener('click', function () {
 		window.event.stopPropagation();
-                let box = window.event.target;
-                let span = box.getElementsByTagName('span')[0];
+                let option = window.event.target;
+                let span = option.getElementsByTagName('span')[0];
                 let checked;
                 if(span.style.visibility == 'hidden'){
                     span.style.visibility = 'visible';
@@ -157,12 +158,12 @@ class Viewer {
                 this.toggleAtomLabels(checked);
             }.bind(this));
         }
-        boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-foreground");
-        for(let x = 0;x < boxes.length;++x) {
-            boxes[x].addEventListener('click', function () {
+        options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-foreground");
+        for(let x = 0;x < options.length;++x) {
+            options[x].addEventListener('click', function () {
 		window.event.stopPropagation();
-                let box = window.event.target;
-                let span = box.getElementsByTagName('span')[0];
+                let option = window.event.target;
+                let span = option.getElementsByTagName('span')[0];
                 let checked;
                 if(span.style.visibility == 'hidden'){
                     span.style.visibility = 'visible';
@@ -174,12 +175,12 @@ class Viewer {
                 this.toggleForeground(checked);
             }.bind(this));
         }
-        boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-background");
-        for(let x = 0;x < boxes.length;++x) {
-            boxes[x].addEventListener('click', function () {
+        options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-background");
+        for(let x = 0;x < options.length;++x) {
+            options[x].addEventListener('click', function () {
 		window.event.stopPropagation();
-                let box = window.event.target;
-                let span = box.getElementsByTagName('span')[0];
+                let option = window.event.target;
+                let span = option.getElementsByTagName('span')[0];
                 let checked;
                 if(span.style.visibility == 'hidden'){
                     span.style.visibility = 'visible';
@@ -191,12 +192,12 @@ class Viewer {
                 this.toggleBackground(checked);
             }.bind(this));
         }
-        boxes = document.getElementById(this.parent_id).getElementsByClassName("jsmol-wireframe");
-        for(let x = 0;x < boxes.length;++x) {
-            boxes[x].addEventListener('click', function () {
+        options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-wireframe");
+        for(let x = 0;x < options.length;++x) {
+            options[x].addEventListener('click', function () {
 		window.event.stopPropagation();
-                let box = window.event.target;
-                let span = box.getElementsByTagName('span')[0];
+                let option = window.event.target;
+                let span = option.getElementsByTagName('span')[0];
                 let checked;
                 if(span.style.visibility == 'hidden'){
                     span.style.visibility = 'visible';
@@ -237,7 +238,7 @@ class Viewer {
     toggleBackground(checked){
 	let myJmol = this.model;
 	if(checked){
-		let selector = document.getElementById(`${this.model_container_id}_color`);
+		let selector = document.getElementById(`${this.color_selector_id}`);
 		selector.click();
 		selector.addEventListener("change", function(){
 			let color = window.event.target.value;

@@ -38,6 +38,7 @@ var newSessionServiceUrl = '/service/chemref/newsession';
 var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
 var MAX_OPEN_REPORTS = 10;
+var TARGET_LIST = null;
 
 (function() {
     var b, d, c = this,
@@ -369,6 +370,7 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 	    // restrict to exact results only
 	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
 	    let stdSearchTargetList = simSearch.find('span.stdSearchTargetList').text();
+	    TARGET_LIST = stdSearchTargetList;
 	    logContext("processing " + stdSearchTargetList);
 	    
 	    if(simSearch.find('i').text() == 'like'){
@@ -528,6 +530,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    if(tab_name == '3d'){
       app_name = 'jsmol';
    }
+   // if search val starts with number, could result in errors (requires server side fix)
    let container_name = `${search_val}_${app_name}_${xyzType}`;
    let expt_or_ideal = xyzType;
    if(expt_or_ideal == 'expt'){
