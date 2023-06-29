@@ -339,18 +339,23 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
     var resultSetTableId = '';
     //
     if (!jsonObj.errFlag) {
-        logContext("Displaying " + contentId)
+        logContext("Displaying content id " + contentId)
         $(contentId).show();
         //$(contentId + ' div.search-results').show();
+    }
+    //
+    if (jsonObj.errflag) {
+        logContext('Error flag is set  = ' + jsonObj.errflag);
+
     }
     //
     // $(contentId).empty();
     //
     if ('resultSetTableData' in jsonObj) {
         var myData = JSON.parse(jsonObj.resultSetTableData);
-        if (consoleDebug) {
-            logContext(" myData props  = " + Object.getOwnPropertyNames(myData).sort());
-        }
+        //if (consoleDebug) {
+        //    logContext(" myData props  = " + Object.getOwnPropertyNames(myData).sort());
+        //}
         for (var myId in myData) {
             rS = myData[myId];
             if (Object.getOwnPropertyNames(rS).length == 0) {
@@ -364,14 +369,14 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
             var resultSetTableId = rS.resultSetTableId;
             var rsData = rS.resultSetTableData;
 
-            //logContext("data set length " + rsData.length);
-            logContext(" data table dom id " + resultSetTableId);
+            logContext("data set length " + rsData.length);
+            logContext(" data table dom id (resultSetTableId) " + resultSetTableId);
 	    
 	    // restrict to exact results only
 	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
 	    let stdSearchTargetList = simSearch.find('span.stdSearchTargetList').text();
 	    TARGET_LIST = stdSearchTargetList;
-	    logContext("processing " + stdSearchTargetList);
+	    logContext("processing search target list " + stdSearchTargetList);
 	    
 	    if(simSearch.find('i').text() == 'like'){
 		// hide similarity results
@@ -392,33 +397,30 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 		$(contentId).find(".app-ref-report").slice(0,MAX_OPEN_REPORTS).click();
 	    }
 
-            logContext("Displaying " + resultSetContainerId)
+            logContext("Displaying result set container id " + resultSetContainerId)
+	    //$(resultSetContainerId).show();
         }
     } else {
         logContext(" No table data in object ")
         logContext(" jsonObj props = " + Object.getOwnPropertyNames(jsonObj).sort());
     }
 
-    //
-    if (jsonObj.errflag) {
-        logContext('Error flag is set  = ' + jsonObj.errflag);
-
-    }
 }
 
 function assignReportOp(selector) {
     $(selector).unbind("click").on("click", function(e) {
 
-        var reportId = "#" + $(this).html().toString() + "_report_section";
-        logContext("Report display request for idCode " + reportId);
+	var targetName = $(this).html().toString();
+        var reportId = "#" + targetName + "_report_section";
+        logContext("Display request for report id " + reportId);
 
         // look for an existing report section -
         if ($(reportId).length) {
             logContext("Skip existing report display request for " + reportId);
             return true
         }
-	
         e.preventDefault();
+	logContext("ajax request for " + targetName);
         $.ajax({
             cache: false,
             type: "post",
@@ -427,15 +429,18 @@ function assignReportOp(selector) {
             data: {
                 operation: "report",
                 sessionid: sessionId,
-                idcode: $(this).html(),
+                idcode: targetName,
             },
             success: function(jsonObj) {
                 //logContext("Report operation completed");
                 // updateLinkContent(jsonObj,   '#chemref-inline-idops-form');
                 if('idCodeList' in jsonObj){
 			if(jsonObj.idCodeList.length > 0){
+				//logContext("updating " + jsonObj.idCodeList);
                 		updateReportContent(jsonObj, '#chemref-report-results-container');
-                		assignReportOp("a.app-ref-report");
+                		//assignReportOp("a.app-ref-report");
+			} else {
+				logContext("could not find object on page " + jsonObj.idCodeList);
 			}
 		}
             }
@@ -446,7 +451,7 @@ function assignReportOp(selector) {
 function updateReportContent(jsonObj, contentId) {
     var retHtml = jsonObj.htmlcontent;
     var errFlag = jsonObj.errorflag;
-    logContext('Updating report content  = ' + contentId);
+    logContext('Updating report content for ' + jsonObj.idCodeList + ' at ' + contentId);
     if (!errFlag) {
         $(contentId).show();
         //logContext('Updating report content  with = ' + retHtml);
@@ -461,9 +466,15 @@ function updateReportContent(jsonObj, contentId) {
             $($(this).attr("data-target")).toggleClass('active');
              }
         });
+        selectValue = $("#searchType1 option:selected").text();
         // Activate 3D views
-        set3dEventListener(jsonObj, '3d');
-        set3dEventListener(jsonObj, 'ataglance');
+        if(! jsonObj.idCodeList[0].startsWith("FAM")){
+       		set3dEventListener(jsonObj, '3d');
+       		set3dEventListener(jsonObj, 'ataglance');
+	}
+    } else {
+	logContext('error flag on ' + contentId);
+	logContext(JSON.stringify(jsonObj));
     }
 }
 
@@ -488,7 +499,7 @@ function set3dEventListener(jsonObj, tab_name){
 		       a.click();
 		    }
 		 } else {
-		    console.log("anchor not found");
+		    console.log("anchor not found " + jsmolId);
 		 }
 	    } else {
 	        console.log(`${jsmolId} not found`);
