@@ -54,7 +54,7 @@ class Viewer {
                     <a>atom labels<span style="float:right;visibility:visible;">&check;</span></a>
                 </li>
                 <li class="jsmol-foreground">
-                    <a>foreground<span style="float:right;visibility:hidden;">&check;</span></a>
+                    <a>foreground<span style="float:right;visibility:visible;">&check;</span></a>
                 </li>
                 <li class="jsmol-background">
                     <a>background<span style="float:right;visibility:hidden;">&check;</span></a>
@@ -112,6 +112,7 @@ class Viewer {
 	this.resetLarge();
 	this.toggleHydrogens(false);
 	this.toggleAtomLabels(true);
+	this.toggleForeground(true);
     };
     resetSmall(){
 	    let reset = "wireframe reset;spacefill reset;";

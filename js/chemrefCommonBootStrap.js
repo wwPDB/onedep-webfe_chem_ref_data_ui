@@ -145,14 +145,6 @@ $(document).ready(function() {
             }
         });
 
-	// enable comma separated lists by replacing commas with blanks (otherwise app adds extra commas)
-	$("#searchTarget1").keyup(function(evt){
-		var searchTarget = evt.target.value;
-		if(searchTarget.indexOf(',') >= 0){
-			document.getElementById("searchTarget1").value = searchTarget.replace(",", " ");
-		}
-	});
-
         <!-- chemref reference entity search form -->
         $('#chemref-full-search-form').ajaxForm({
             url: chemrefFullSearchUrl,
