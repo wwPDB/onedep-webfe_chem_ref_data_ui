@@ -382,11 +382,11 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                         assignReportOp("a.app-ref-report");
                     },
                 });
-		// expand exact results, restrict to 10
+		// expand exact results on 3-letter cc id, restrict to 10
 		// keep chevron closed for readability
 		// chevron = $(contentId).find(".chevron").parent();
 		// chevron.click();
-		$(contentId).find(".app-ref-report").slice(0,MAX_OPEN_REPORTS).click();
+		$(contentId).find(".app-ref-report").filter(function(){return $(this).text().length == 3}).slice(0,MAX_OPEN_REPORTS).click();
 	    }
 
             logContext("Displaying result set container id " + resultSetContainerId)
