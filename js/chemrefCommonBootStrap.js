@@ -364,15 +364,26 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
             logContext("data set length " + rsData.length);
             logContext(" data table dom id (resultSetTableId) " + resultSetTableId);
 	    
-	    // restrict to exact results only
-	    let simSearch = $("#" + resultSetContainerId).parent().parent().parent();
-	    let stdSearchTargetList = simSearch.find('span.stdSearchTargetList').text();
+	    // restrict to exact results only unless search is entirely based on similarity
+	    let similarity = $("#" + resultSetContainerId).parent().parent().parent();
+	    logContext("similarity search selector = " + similarity.attr('id'));
+	    panelTitle = similarity.find('.panel-title');
+	    searchScope = panelTitle.find('i');
+	    notSubcomponentSubset = similarity.find(".panel-title:contains('Subcomponent subset')").length == 0;
+	    notSubcomponentSequence = similarity.find(".panel-title:contains('subcomponent sequence')").length == 0;
+	    notPrdType = similarity.find(".panel-title:contains('BIRD type')").length == 0;
+	    notPrdChemicalComponentId = similarity.find(".panel-title:contains('BIRD chemical component ID')").length == 0;
+	    notPrdFormula = similarity.find(".panel-title:contains('BIRD formula')").length == 0;
+	    notPrdClass = similarity.find(".panel-title:contains('BIRD class')").length == 0;
+	    hideResults = searchScope.text() == 'like' && notSubcomponentSubset && notSubcomponentSequence && notPrdType && notPrdChemicalComponentId && notPrdFormula && notPrdClass; 
+	    // save search targets into variable
+	    let stdSearchTargetList = similarity.find('span.stdSearchTargetList').text();
 	    TARGET_LIST = stdSearchTargetList;
 	    logContext("processing search target list " + stdSearchTargetList);
-	    
-	    if(simSearch.find('i').text() == 'like'){
+
+	    if(hideResults){
 		// hide similarity results
-	        simSearch.hide();
+	        similarity.hide();
 	    } else {
                 $("#" + resultSetTableId).bootstrapTable({
                     data: rsData,
@@ -380,7 +391,7 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                     onPostBody: function(){
                         //logContext("Fired post body");
                         assignReportOp("a.app-ref-report");
-                    },
+                    }
                 });
 		// expand exact results on 3-letter cc id, restrict to 10
 		// keep chevron closed for readability
@@ -549,7 +560,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    width = Number(width) - Number(padding) - Number(margin) - Number(border);
    height = Number(height) - Number(padding) - Number(margin) - Number(border) - adjustment;
    j2s_path = '/assets/js/JSmol-16.1.11/j2s';
-   view = new Viewer(
+   view = new JsmolViewerComponent(
                    container_name,
                    search_val,
                    webXyzPath,

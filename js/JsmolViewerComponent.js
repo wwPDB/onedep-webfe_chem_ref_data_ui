@@ -1,4 +1,4 @@
-class Viewer {
+class JsmolViewerComponent {
     constructor(parent_id, search_val, webXyzPath, expt_or_ideal, title, width, height, j2s_path, tab_name){
         this.parent_id = parent_id;
         this.search_val = search_val;
