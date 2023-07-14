@@ -1,4 +1,4 @@
-class JsmolViewerComponent {
+class Viewer {
     constructor(parent_id, search_val, webXyzPath, expt_or_ideal, title, width, height, j2s_path, tab_name){
         this.parent_id = parent_id;
         this.search_val = search_val;
@@ -34,7 +34,8 @@ class JsmolViewerComponent {
 	this.menu_right_padding = 5;
 	this.menu_button_padding = 0;
 
-        document.getElementById(this.parent_id).innerHTML = `
+
+        let modernVersion = `
 <div style="width:${this.width}px;height:${this.height}px;background-color:white;" class="container jsmol_search_result_table">
     <div class="row">
         <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
@@ -70,6 +71,72 @@ class JsmolViewerComponent {
     </div>
 </div>
 `;
+
+
+        let legacyVersion = `
+<div style="width:${this.width}px;height:${this.height}px;background-color:white;" class="container jsmol_search_result_table">
+    <div class="row">
+        <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
+	<div style="display:inline-flex;float:right;">
+        <div class="dropdown" style="position:relative;z-index:10;display:inline-block;padding-right:${this.menu_right_padding}px;">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" style="background-color:${this.menu_background};padding:${this.menu_button_padding}px;border-color:${this.menu_border};">
+                <span>
+		    <img src="${this.menu_icon}" style="width:${this.menu_width}px;height:${this.menu_height}px;">
+                </span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li class="jsmol-hydrogens">
+                    <a>hydrogens<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+                <li class="jsmol-atom-labels">
+                    <a>atom labels<span style="float:right;visibility:visible;">&check;</span></a>
+                </li>
+                <li class="jsmol-foreground">
+                    <a>foreground<span style="float:right;visibility:visible;">&check;</span></a>
+                </li>
+                <li class="jsmol-background">
+                    <a>background<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+                <li class="jsmol-wireframe">
+                    <a>wireframe<span style="float:right;visibility:hidden;">&check;</span></a>
+                </li>
+            </ul>
+        </div>
+        </div>
+    </div>
+    <div id="${this.model_container_id}" style="position:relative;z-index:1;" class="row">
+    </div>
+</div>
+`;
+
+	this.userAgent = navigator.userAgent;
+	this.legacy = true;
+	let version = 0;
+	if(this.userAgent.indexOf('Edg') >= 0){
+		version = this.userAgent.split('Edg/')[1].split('.')[0];
+		if(version && version.match(/^\d+$/) && Number(version) >= 114){
+			this.legacy = false;
+		}
+	} else if(this.userAgent.indexOf('Chrome') >= 0){
+		version = this.userAgent.split('Chrome/')[1].split('.')[0];
+		if(version && version.match(/^\d+$/) && Number(version) >= 105){
+			this.legacy = false;
+		}
+	} else if(this.userAgent.indexOf('Safari') >= 0){
+		version = this.userAgent.split('Version/')[1].split('.')[0];
+		if(version && version.match(/^\d+$/) && Number(version) >= 15){
+			this.legacy = false;
+		}
+	} else if(this.userAgent.indexOf('Firefox') >= 0){
+		version = this.userAgent.split('Firefox/')[1].split('.')[0];
+		if(version && version.match(/^\d+$/) && Number(version) >= 115){
+			this.legacy = false;
+		}
+	}
+	let supportedVersion = this.legacy? legacyVersion : modernVersion;
+
+        document.getElementById(this.parent_id).innerHTML = supportedVersion;
+
         this.JmolInfo = {
             j2sPath:this.j2s_path,
             serverURL: "",
@@ -190,7 +257,11 @@ class JsmolViewerComponent {
                     span.style.visibility = 'hidden';
                     checked = false;
                 }
-                this.toggleBackground(checked);
+		if(this.legacy){
+			this.toggleLegacyBackground(checked);
+		} else {	
+                	this.toggleBackground(checked);
+		}
             }.bind(this));
         }
         options = document.getElementById(this.parent_id).getElementsByClassName("jsmol-wireframe");
@@ -250,14 +321,14 @@ class JsmolViewerComponent {
 		Jmol.script(eval(myJmol), `background "${this.default_background}"`);
 	}
     }
-    /**toggleBackground(checked) {
+    toggleLegacyBackground(checked) {
         let myJmol = this.model;
         if(checked) {
             Jmol.script(eval(myJmol), `background "${this.alt_background}"`);
         } else {
             Jmol.script(eval(myJmol), `background "${this.default_background}"`);
         }
-    }**/
+    }
     toggleWireframe(checked) {
         let myJmol = this.model;
         if(checked) {

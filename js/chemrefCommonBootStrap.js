@@ -393,11 +393,11 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                         assignReportOp("a.app-ref-report");
                     }
                 });
-		// expand exact results on 3-letter cc id, restrict to 10
+		// expand exact results on 3-or-5-letter cc id, restrict to 10
 		// keep chevron closed for readability
 		// chevron = $(contentId).find(".chevron").parent();
 		// chevron.click();
-		$(contentId).find(".app-ref-report").filter(function(){return $(this).text().length == 3}).slice(0,MAX_OPEN_REPORTS).click();
+		$(contentId).find(".app-ref-report").filter(function(){return $(this).text().length == 3 || $(this).text().length == 5}).slice(0,MAX_OPEN_REPORTS).click();
 	    }
 
             logContext("Displaying result set container id " + resultSetContainerId)
@@ -560,7 +560,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    width = Number(width) - Number(padding) - Number(margin) - Number(border);
    height = Number(height) - Number(padding) - Number(margin) - Number(border) - adjustment;
    j2s_path = '/assets/js/JSmol-16.1.11/j2s';
-   view = new JsmolViewerComponent(
+   view = new Viewer(
                    container_name,
                    search_val,
                    webXyzPath,
