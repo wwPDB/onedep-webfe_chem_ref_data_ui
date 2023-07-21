@@ -35,7 +35,7 @@ class Viewer {
 	this.menu_button_padding = 0;
 
 
-        let modernVersion = `
+        let v1 = `
 <div style="width:${this.width}px;height:${this.height}px;background-color:white;" class="container jsmol_search_result_table">
     <div class="row">
         <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
@@ -72,8 +72,8 @@ class Viewer {
 </div>
 `;
 
-
-        let legacyVersion = `
+	// browser version compatible
+        let v2 = `
 <div style="width:${this.width}px;height:${this.height}px;background-color:white;" class="container jsmol_search_result_table">
     <div class="row">
         <label style="padding-left:${this.title_left_padding}px;">${this.title}</label>
@@ -109,31 +109,32 @@ class Viewer {
 </div>
 `;
 
+	// detect browser version and select appropriate components
 	this.userAgent = navigator.userAgent;
-	this.legacy = true;
+	this.use_v2 = true;
 	let version = 0;
 	if(this.userAgent.indexOf('Edg') >= 0){
 		version = this.userAgent.split('Edg/')[1].split('.')[0];
 		if(version && version.match(/^\d+$/) && Number(version) >= 114){
-			this.legacy = false;
+			this.use_v2 = false;
 		}
 	} else if(this.userAgent.indexOf('Chrome') >= 0){
 		version = this.userAgent.split('Chrome/')[1].split('.')[0];
 		if(version && version.match(/^\d+$/) && Number(version) >= 105){
-			this.legacy = false;
+			this.use_v2 = false;
 		}
 	} else if(this.userAgent.indexOf('Safari') >= 0){
 		version = this.userAgent.split('Version/')[1].split('.')[0];
 		if(version && version.match(/^\d+$/) && Number(version) >= 15){
-			this.legacy = false;
+			this.use_v2 = false;
 		}
 	} else if(this.userAgent.indexOf('Firefox') >= 0){
 		version = this.userAgent.split('Firefox/')[1].split('.')[0];
 		if(version && version.match(/^\d+$/) && Number(version) >= 115){
-			this.legacy = false;
+			this.use_v2 = false;
 		}
 	}
-	let supportedVersion = this.legacy? legacyVersion : modernVersion;
+	let supportedVersion = this.use_v2? v2 : v1;
 
         document.getElementById(this.parent_id).innerHTML = supportedVersion;
 
@@ -257,8 +258,8 @@ class Viewer {
                     span.style.visibility = 'hidden';
                     checked = false;
                 }
-		if(this.legacy){
-			this.toggleLegacyBackground(checked);
+		if(this.use_v2){
+			this.toggleV2Background(checked);
 		} else {	
                 	this.toggleBackground(checked);
 		}
@@ -321,7 +322,7 @@ class Viewer {
 		Jmol.script(eval(myJmol), `background "${this.default_background}"`);
 	}
     }
-    toggleLegacyBackground(checked) {
+    toggleV2Background(checked) {
         let myJmol = this.model;
         if(checked) {
             Jmol.script(eval(myJmol), `background "${this.alt_background}"`);
