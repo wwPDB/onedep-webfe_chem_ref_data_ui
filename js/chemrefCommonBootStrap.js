@@ -12,6 +12,7 @@
  *    14-Jun-2017 jdw toggle tabs - diminish jump scrolling behavior -
  *    14-Jun-2017 jdw fix report and search section visibility on empty
  *    18-Jun-2017 jdw relace DOMSubtreeModified with MutationObserver -
+ *    Jun-2023 james smith replace ngl with jsmol
  *
  * if ( $.trim( $('#leftmenu').text() ) == "")
  *  $('#leftMenuWrapper').remove();
@@ -36,6 +37,8 @@ var chemrefEditorUrl = '/service/chemref/editor';
 var newSessionServiceUrl = '/service/chemref/newsession';
 var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
+var MAX_OPEN_REPORTS = 10;
+var TARGET_LIST = null;
 
 (function() {
     var b, d, c = this,
@@ -48,12 +51,6 @@ var pagePath = '';
     b.history = d = []
 })();
 
-/*
-String.prototype.startsWith = function(str) {
-    return this.indexOf(str) == 0;
-};
-*/
-
 function logContext(message) {
     //console.log("%lc: " + message + " ( session id " + sessionId + " entry id " + entryId + " entry filename " + entryModelFileName + ")");
     // log("%lc: " + message + " ( session id " + sessionId + " entry id " + entryId + " entry model filename " + entryModelFileName +" entry sf filename " + entrySfFileName + ")");
@@ -61,108 +58,522 @@ function logContext(message) {
     log("%log: " + message);
 }
 
-function updateNglViews(jsonObj) {
+//
+// Document ready entry point
+//
+
+$(document).ready(function() {
+    $("#uploadProgress").find('*').hide();
+    $('#chemref-report-results-container').hide();
+    $('#chemref-search-results-container').hide();
+
+    getCurrentContext();
+    appendContextToMenuUrls();
+    //
+    if (sessionId.length == 0) {
+        newSession('request session');
+        logContext('Assigning new session id  = ' + sessionId);
+    }
+    // logContext('Selection report container ' + $('#chemref-report-results-container').length);
+
+    if ($("#chemref-full-search-dialog").length > 0) {
+        $('#chemref-report-results-container').hide();
+        $('#chemref-search-results-container').hide();
+        /*
+        $('#report-content').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
+            if (false) {
+                logContext("Modified: " + e.target.nodeName);
+                var vc = $('#report-content  div.results-section').is(":visible");
+                logContext("vis " + vc);
+                var hc = $('#report-content  div.results-section').is(":hidden");
+                logContext("hid " + hc);
+                var num =$('#report-content  div.results-section').length
+                logContext("num " + num)
+             }
+            if ( $.trim( $('#report-content').html() ) == ""){
+                logContext("Report DIV is empty .... ");
+                $('#chemref-report-results-container').hide();
+            }
+        });
+        */
+        createReportObserver('#report-content', '#chemref-report-results-container');
+        createSearchObserver('#chemref-search-results-container', 'div.results-section');
+     /*
+        $('#chemref-search-results-container').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
+            if (false) {
+                logContext("Modified: " + e.target.nodeName);
+                var vc = $('#chemref-search-results-container  div.results-section').is(":visible");
+                logContext("vis " + vc);
+                var hc = $('#chemref-search-results-container  div.results-section').is(":hidden");
+                logContext("hid " + hc);
+            }
+                var num =$('#chemref-search-results-container  div.results-section').length
+                logContext("num " + num)
+            if ( $('#chemref-search-results-container  div.results-section').length == 0  ){
+                logContext("Search DIV is empty .... ");
+                $('#chemref-search-results-container').hide();
+            //} else {
+            //    $('#chemref-search-results-container').show();
+            }
+        });
+        */
+        $("#searchTarget1").typeahead({
+            items: 20,
+            minLength: 2,
+            source: function(query, response) {
+                $.ajax({
+                    cache: false,
+                    timeout: 60000,
+                    type: "post",
+                    url: "/service/chemref/search/autocomplete",
+                    dataType: "json",
+                    data: {
+                        term: query,
+                        extra_param: "constant1",
+                        searchType: $("#searchType1").val(),
+                        searchOp: $("#searchOp1").val()
+                    },
+                    success: function(data) {
+                        if (data != null) {
+                            response(data);
+                        }
+                    }
+                });
+            },
+            select: function(event, ui) {
+                /** console.log(ui.item ? ("Selected: " + ui.item.value + " aka " + ui.item.id) : "Nothing selected, input was " + this.value); **/ 
+            }
+        });
+
+        <!-- chemref reference entity search form -->
+        $('#chemref-full-search-form').ajaxForm({
+            url: chemrefFullSearchUrl,
+            type: 'post',
+            dataType: 'json',
+            success: function(jsonObj) {
+                logContext("Full search completed");
+                progressEnd();
+                $('#chemref-full-search-button').show();
+                updateCompletionStatus(jsonObj, '#chemref-full-search-form');
+                updateSearchResultsBsTable(jsonObj, '#chemref-search-results-container');
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-full-search-status.op-status').hide();
+
+                progressStart();
+                $('#chemref-full-search-button').hide();
+
+                selectValue = $("#searchType1 option:selected").text();
+
+                arr.push({
+                    "name": "searchName",
+                    "value": selectValue
+                });
+
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+
+            }
+        });
+
+    }
+
+    // -- WORKING COLLECTION OF ADMIN FUNCTIONS --
+    if ($("#chemref-admin-dialog").length > 0) {
+        $('#chemref-report-results-container').hide();
+        createReportObserver('#report-content', '#chemref-report-results-container');
+        /*
+        $('#report-content').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
+            if ( $.trim( $('#report-content').html() ) == ""){
+                logContext("Report DIV is empty .... ");
+                $('#chemref-report-results-container').hide();
+            }
+        });
+        */
+        <!-- chemref admin operations form -->
+        $('#chemref-admin-ops-form').ajaxForm({
+            url: chemrefAdminOpsUrl,
+            dataType: 'json',
+            success: function(jsonObj) {
+                //logContext("Operation completed");
+                progressEnd();
+                $('#chemref-admin-ops-button').show();
+                updateCompletionStatus(jsonObj, '#chemref-admin-ops-form');
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-admin-ops-form div.op-status').hide();
+                progressStart();
+                $('#chemref-admin-ops-button').hide();
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+            }
+        });
+
+        <!-- chemref inline idops form -->
+        $('#chemref-inline-idops-form').ajaxForm({
+            url: chemrefIdOpsUrl,
+            dataType: 'json',
+            success: function(jsonObj) {
+                //logContext("Operation completed");
+
+                updateCompletionStatus(jsonObj, '#chemref-inline-idops-form');
+                updateLinkContent(jsonObj, '#chemref-inline-idops-form');
+                updateReportContent(jsonObj, '#chemref-report-results-container');
+                // $('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
+                // $('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
+                //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
+                $('#chemref-report-results-container  div.report-content').show();
+                $('#chemref-inline-idops-button').show();
+                progressEnd();
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-inline-idops-form div.op-status').hide();
+                $('#chemref-inline-idops-form div.op-links').hide();
+                $('#chemref-report-results-container  div.report-content').hide();
+
+                progressStart();
+                $('#chemref-inline-idops-button').hide();
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+            }
+        });
+
+
+        <!-- chemref inline fileops form -->
+        $('#chemref-inline-fileops-form').ajaxForm({
+            url: chemrefFileOpsUrl,
+            dataType: 'json',
+            success: function(jsonObj) {
+                //logContext("Operation completed");
+
+                updateCompletionStatus(jsonObj, '#chemref-inline-fileops-form');
+                updateLinkContent(jsonObj, '#chemref-inline-fileops-form');
+                updateReportContent(jsonObj, '#chemref-report-results-container');
+
+                //$('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
+                //$('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
+                //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
+
+                $('#chemref-report-results-container  div.report-content').show();
+                $('#chemref-inline-fileops-button').show();
+                progressEnd();
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-inline-idops-form div.op-status').hide();
+                $('#chemref-inline-idops-form div.op-links').hide();
+                $('#chemref-report-results-container  div.report-content').hide();
+
+                progressStart();
+                $('#chemref-inline-fileops-button').hide();
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+            }
+        });
+
+    }
+
+    // -- chemref editor --
+    if ($("#chemref-editor-dialog").length > 0) {
+        $('#chemref-editor-form').ajaxForm({
+            url: chemrefEditorUrl,
+            dataType: 'json',
+            success: function(jsonObj) {
+                progressEnd();
+                $('#chemref-editor-button').show();
+                updateCompletionStatus(jsonObj, '#chemref-editor-form');
+                if (('location' in jsonObj) && (jsonObj.location != "")) {
+                    window.open(jsonObj.location, '_blank');
+                }
+            },
+            beforeSubmit: function(arr, $form, options) {
+                $('#chemref-editor-form div.op-status').hide();
+                progressStart();
+                $('#chemref-editor-button').hide();
+                arr.push({
+                    "name": "sessionid",
+                    "value": sessionId
+                });
+            }
+        });
+    }
+
+    <!-- Download task operations -->
+    if ($("#download-dialog").length > 0) {
+        $("#download-logfiles").hide();
+        $("#download-logfiles-label").hide();
+        var sObj = getSessionInfo();
+        updateDownloadOptions(sObj);
+        //
+        $('#download-url').hide();
+        $("#download-url-label").html(getDownloadFileName());
+        setDownloadFileUrl("#download-url");
+    }
+    //    <!-- make the nav item for the current page active -->
+    $('.nav a[href="' + pagePath + '"]').parent().addClass('active');
+
+}); // end-ready
+
+function updateSearchResultsBsTable(jsonObj, contentId) {
+    //
+    //   Appends and renders selected incoming datasets as dynamic tables to dom element 'contentId'
+    //
+    //   ?? Assumes contentId == resultSetContainerId
+    //
+    var resultSetContainerId = '';
+    var resultSetTableId = '';
+    //
+    if (!jsonObj.errFlag) {
+        logContext("Displaying content id " + contentId)
+        $(contentId).show();
+        //$(contentId + ' div.search-results').show();
+    }
+    //
+    if (jsonObj.errflag) {
+        logContext('Error flag is set  = ' + jsonObj.errflag);
+
+    }
+    //
+    // $(contentId).empty();
+    //
+    if ('resultSetTableData' in jsonObj) {
+        var myData = JSON.parse(jsonObj.resultSetTableData);
+        //if (consoleDebug) {
+        //    logContext(" myData props  = " + Object.getOwnPropertyNames(myData).sort());
+        //}
+        for (var myId in myData) {
+            rS = myData[myId];
+            if (Object.getOwnPropertyNames(rS).length == 0) {
+                logContext(" +Skipping empty data set key = " + myId);
+                continue;
+            }
+            //logContext(" rS props  = " + Object.getOwnPropertyNames(rS).sort());
+            resultSetContainerId = rS.resultSetContainerId;
+            $(contentId).append(rS.resultSetTableTemplate);
+
+            var resultSetTableId = rS.resultSetTableId;
+            var rsData = rS.resultSetTableData;
+
+            logContext("data set length " + rsData.length);
+            logContext(" data table dom id (resultSetTableId) " + resultSetTableId);
+	    
+	    // restrict to exact results only unless search is entirely based on similarity
+	    let similarity = $("#" + resultSetContainerId).parent().parent().parent();
+	    logContext("similarity search selector = " + similarity.attr('id'));
+	    panelTitle = similarity.find('.panel-title');
+	    searchScope = panelTitle.find('i');
+	    notSubcomponentSubset = similarity.find(".panel-title:contains('Subcomponent subset')").length == 0;
+	    notSubcomponentSequence = similarity.find(".panel-title:contains('subcomponent sequence')").length == 0;
+	    notPrdType = similarity.find(".panel-title:contains('BIRD type')").length == 0;
+	    notPrdChemicalComponentId = similarity.find(".panel-title:contains('BIRD chemical component ID')").length == 0;
+	    notPrdFormula = similarity.find(".panel-title:contains('BIRD formula')").length == 0;
+	    notPrdClass = similarity.find(".panel-title:contains('BIRD class')").length == 0;
+	    hideResults = searchScope.text() == 'like' && notSubcomponentSubset && notSubcomponentSequence && notPrdType && notPrdChemicalComponentId && notPrdFormula && notPrdClass; 
+	    // save search targets into variable
+	    let stdSearchTargetList = similarity.find('span.stdSearchTargetList').text();
+	    TARGET_LIST = stdSearchTargetList;
+	    logContext("processing search target list " + stdSearchTargetList);
+
+	    if(hideResults){
+		// hide similarity results
+	        similarity.hide();
+	    } else {
+                $("#" + resultSetTableId).bootstrapTable({
+                    data: rsData,
+                    exportDataType: 'all',
+                    onPostBody: function(){
+                        //logContext("Fired post body");
+                        assignReportOp("a.app-ref-report");
+                    }
+                });
+                notInstanceSearch = similarity.find(".panel-title:contains('public')").length == 0 && similarity.find(".panel-title:contains('internal')").length == 0;
+                if(notInstanceSearch){
+		   // expand exact results on 3-or-5-letter cc id, restrict to 10
+		   // keep chevron closed for readability
+		   // chevron = $(contentId).find(".chevron").parent();
+		   // chevron.click();
+		   $(contentId).find(".app-ref-report").filter(function(){return $(this).text().length == 3 || $(this).text().length == 5}).slice(0,MAX_OPEN_REPORTS).click();
+                }
+	    }
+
+            logContext("Displaying result set container id " + resultSetContainerId)
+	    //$(resultSetContainerId).show();
+        }
+    } else {
+        logContext(" No table data in object ")
+        logContext(" jsonObj props = " + Object.getOwnPropertyNames(jsonObj).sort());
+    }
+
+}
+
+function assignReportOp(selector) {
+    $(selector).unbind("click").on("click", function(e) {
+
+	var targetName = $(this).html().toString();
+        var reportId = "#" + targetName + "_report_section";
+        logContext("Display request for report id " + reportId);
+
+        // look for an existing report section -
+        if ($(reportId).length) {
+            logContext("Skip existing report display request for " + reportId);
+            return true
+        }
+        e.preventDefault();
+	logContext("ajax request for " + targetName);
+        $.ajax({
+            cache: false,
+            type: "post",
+            url: chemrefIdOpsUrl,
+            dataType: 'json',
+            data: {
+                operation: "report",
+                sessionid: sessionId,
+                idcode: targetName,
+            },
+            success: function(jsonObj) {
+                //logContext("Report operation completed");
+                // updateLinkContent(jsonObj,   '#chemref-inline-idops-form');
+                if('idCodeList' in jsonObj){
+			if(jsonObj.idCodeList.length > 0){
+				//logContext("updating " + jsonObj.idCodeList);
+                		updateReportContent(jsonObj, '#chemref-report-results-container');
+                		//assignReportOp("a.app-ref-report");
+			} else {
+				logContext("could not find object on page " + jsonObj.idCodeList);
+			}
+		}
+            }
+        });
+    });
+}
+
+function updateReportContent(jsonObj, contentId) {
+    var retHtml = jsonObj.htmlcontent;
+    var errFlag = jsonObj.errorflag;
+    logContext('Updating report content for ' + jsonObj.idCodeList + ' at ' + contentId);
+    if (!errFlag) {
+        $(contentId).show();
+        //logContext('Updating report content  with = ' + retHtml);
+        //logContext('Selection container ' + $(contentId).length);
+        //logContext('Selection report div ' + $(contentId + ' div.report-content').length);
+        $(contentId + ' div.report-content').append(retHtml);
+        $(contentId + ' div.report-content').show();
+        $('[data-toggle=tab]').unbind("click").on("click", function(e){
+            e.preventDefault();
+            //e.stopImmediatePropagation();
+            if ($(this).parent().hasClass('active')){
+            $($(this).attr("data-target")).toggleClass('active');
+             }
+        });
+        selectValue = $("#searchType1 option:selected").text();
+        // Activate 3D views
+        if(! jsonObj.idCodeList[0].startsWith("FAM")){
+       		set3dEventListener(jsonObj, '3d');
+       		set3dEventListener(jsonObj, 'ataglance');
+	}
+    } else {
+	logContext('error flag on ' + contentId);
+	logContext(JSON.stringify(jsonObj));
+    }
+}
+
+function set3dEventListener(jsonObj, tab_name){
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
-        var idCode;
         for (var i = 0; i < webPathList.length; i++) {
-            //logContext("launchNgl webPath is " + webPathList[i]);
-            //logContext("launchNgl idCode  is " + idCodeList[i]);
-            nglId = "#" + idCodeList[i]+"_ngl_expt"
-            if ($(nglId).length) {
-                makeNglView(idCodeList[i], webPathList[i], 'expt');
+            let app_name = 'ataglance';
+	    if(tab_name == '3d'){
+               app_name = 'jsmol';
             }
-            nglId = "#" + idCodeList[i]+"_ngl_ideal"
-            if ($(nglId).length) {
-                makeNglView(idCodeList[i], webPathList[i], 'ideal');
+            jsmolId = `${app_name}-section-` + idCodeList[i].toUpperCase();
+	    if(document.getElementsByClassName(jsmolId)){
+	         let a = document.getElementsByClassName(jsmolId)[0];
+		 if(a){
+		    a.addEventListener("click", function(){
+	               updateJsmolViews(jsonObj, tab_name);
+	            }.bind(jsonObj));
+		    if(app_name == 'ataglance'){
+		       // expand results on first viewing
+		       a.click();
+		    }
+		 } else {
+		    console.log("anchor not found " + jsmolId);
+		 }
+	    } else {
+	        console.log(`${jsmolId} not found`);
+	    }
+	}
+    }
+}
+
+function updateJsmolViews(jsonObj, tab_name) {
+    if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
+        var webPathList = jsonObj.webPathList.toString().split(",");
+        var idCodeList = jsonObj.idCodeList.toString().split(",");
+        for (var i = 0; i < webPathList.length; i++) {
+            //logContext("launchJsmol webPath is " + webPathList[i]);
+            //logContext("launchJsmol idCode  is " + idCodeList[i]);
+            if(tab_name == '3d'){
+                jsmolId = "#" + idCodeList[i]+"_jsmol_expt";
+                if ($(jsmolId).length) {
+                    makeJsMolView(idCodeList[i], webPathList[i], 'expt', tab_name);
+                }
+	    }
+	    let app_name = 'ataglance';
+	    if(tab_name == '3d'){
+	       app_name = 'jsmol';
+	    }
+            jsmolId = "#" + idCodeList[i]+`_${app_name}_ideal`
+            if ($(jsmolId).length) {
+                makeJsMolView(idCodeList[i], webPathList[i], 'ideal', tab_name);
             }
         }
     }
 }
 
-function makeNglView(idCode, webXyzPath, xyzType) {
-    //logContext("launchNgl webPath is " + webXyzPath);
-    //logContext("launchNgl idCode  is " + idCode);
-    // maintain graphics context in displayed reports
-    //var globalNglObj = {};
-    var nglId;
-    var xyxSelId;
-
-    if (xyzType == 'ideal') {
-        nglId = idCode + "_ngl_ideal";
-        xyzSelId = "/1";
-    } else {
-        nglId = idCode + "_ngl_expt";
-        xyzSelId = "/0";
-    }
-
-    //logContext("nglId  is    " + nglId);
-    //logContext("xyzSelId  is " + xyzSelId);
-    // only if there is element in place -
-    if ($(nglId).length) {
-        logContext("Skip missing ngl pane for " + nglId);
-        return true
-}
-    //
-    var stage = new NGL.Stage(nglId, { backgroundColor: "white" });
-    //globalNglObj[nglId] = stage;
-    //
-    var tooltip = document.createElement("div");
-    Object.assign(tooltip.style, {
-        display: "none",
-        position: "fixed",
-        zIndex: 10,
-        pointerEvents: "none",
-        backgroundColor: "rgba( 0, 0, 0, 0.6 )",
-        color: "lightgrey",
-        padding: "0.5em",
-        fontFamily: "sans-serif"
-    });
-    document.body.appendChild(tooltip);
-    //
-    stage.setSize("600px", "600px");
-    stage.loadFile(webXyzPath).then(function(o) {
-        o.addRepresentation("licorice", { sele: xyzSelId, multipleBond: "symmetric", color: "element" });
-        stage.autoView();
-        //var pa = o.structure.getPrincipalAxes();
-        //stage.animationControls.rotate(pa.getRotationQuaternion(), 1500);
-    });
-    stage.mouseControls.remove("hoverPick");
-    // listen to `hovered` signal to move tooltip around and change its text
-    stage.signals.hovered.add(function(pickingProxy) {
-        if (pickingProxy && (pickingProxy.atom || pickingProxy.bond)) {
-            var atom = pickingProxy.atom || pickingProxy.closestBondAtom;
-
-            if (pickingProxy.atom) {
-                var atom = pickingProxy.atom || pickingProxy.closestBondAtom;
-                tooltip.innerText = "atom: " + atom.atomname;
-            } else if (pickingProxy.bond) {
-                var bond = pickingProxy.bond;
-                tooltip.innerText = "bond: " + bond.atom1.atomname + " - " + bond.atom2.atomname
-            }
-
-            var cp = pickingProxy.mouse.position;
-            tooltip.style.bottom = window.innerHeight - cp.y + 3 + "px";
-            tooltip.style.left = cp.x + 3 + "px";
-            tooltip.style.display = "block";
-        } else {
-            tooltip.style.display = "none";
-        }
-    });
-    //
-    var selId = "div.ngl-class-" + xyzType + "-" + idCode
-    $(selId).visibilityChanged({
-        callback: function(element, visible) {
-            // do something here
-            //logContext("NGL handle resize called id " + element[0].id)
-            //logContext("NGL handle resize called class " + element[0].className)
-            //logContext("NGL handle resize called idcode " + element[0].getAttribute("data-payload"))
-            stage.handleResize();
-        },
-        runOnLoad: false,
-        frequency: 100
-    });
+function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
+   logContext("idCode " + search_val);
+   logContext("webXyzPath " + webXyzPath);
+   logContext("xyzType " + xyzType);
+   let app_name = 'ataglance';
+   if(tab_name == '3d'){
+      app_name = 'jsmol';
+   }
+   // if search val starts with number, could result in errors (requires server side fix)
+   let container_name = `${search_val}_${app_name}_${xyzType}`;
+   let expt_or_ideal = xyzType;
+   if(expt_or_ideal == 'expt'){
+      expt_or_ideal = 'experimental';
+   }
+   let container = document.getElementById(container_name);
+   let width = container.style.width.replace("px", "");
+   let height = container.style.height.replace("px", "");
+   let padding = container.style.padding.replace("px", "");
+   let margin = container.style.margin.replace("px", "");
+   let border = container.style.borderWidth.replace("px", "");
+   let adjustment = 3;
+   width = Number(width) - Number(padding) - Number(margin) - Number(border);
+   height = Number(height) - Number(padding) - Number(margin) - Number(border) - adjustment;
+   j2s_path = '/assets/js/JSmol-16.1.11/j2s';
+   view = new Viewer(
+                   container_name,
+                   search_val,
+                   webXyzPath,
+                   xyzType,
+                   `${search_val} ${expt_or_ideal} coordinates`,
+                   width,
+                   height,
+                   j2s_path,
+		   tab_name
+           )
 }
 
 function setDownloadFileUrl(id) {
@@ -375,28 +786,6 @@ function updateCompletionStatus(jsonObj, statusId) {
     $(statusId + ' div.op-status').show();
 }
 
-function updateReportContent(jsonObj, contentId) {
-    var retHtml = jsonObj.htmlcontent;
-    var errFlag = jsonObj.errorflag;
-    logContext('Updating report content  = ' + contentId);
-    if (!errFlag) {
-        $(contentId).show();
-        //logContext('Updating report content  with = ' + retHtml);
-        //logContext('Selection container ' + $(contentId).length);
-        //logContext('Selection report div ' + $(contentId + ' div.report-content').length);
-        $(contentId + ' div.report-content').append(retHtml);
-        $(contentId + ' div.report-content').show();
-        $('[data-toggle=tab]').unbind("click").on("click", function(e){
-            e.preventDefault();
-            //e.stopImmediatePropagation();
-            if ($(this).parent().hasClass('active')){
-            $($(this).attr("data-target")).toggleClass('active');
-             }
-        });
-    }
-    // Activate 3D views
-    updateNglViews(jsonObj);
-}
 
 function updateLinkContent(jsonObj, contentId) {
     var retHtml = jsonObj.htmllinkcontent;
@@ -414,108 +803,6 @@ function updateLinkContent(jsonObj, contentId) {
     }
 }
 
-
-function assignReportOp(selector) {
-    $(selector).unbind("click").on("click", function(e) {
-
-        var reportId = "#" + $(this).html().toString() + "_report_section";
-        // look for an existing report section -
-        //logContext("Report display request for idCode " + reportId);
-
-        if ($(reportId).length) {
-            logContext("Skip existing report display request for " + reportId);
-            return true
-        }
-
-        e.preventDefault();
-        $.ajax({
-            cache: false,
-            type: "post",
-            url: chemrefIdOpsUrl,
-            dataType: 'json',
-            data: {
-                operation: "report",
-                sessionid: sessionId,
-                idcode: $(this).html(),
-            },
-            success: function(jsonObj) {
-                //logContext("Report operation completed");
-                // updateLinkContent(jsonObj,   '#chemref-inline-idops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
-                assignReportOp("a.app-ref-report");
-            }
-        });
-    });
-}
-
-function updateSearchResultsBsTable(jsonObj, contentId) {
-    //
-    //   Appends and renders selected incoming datasets as dynamic tables to dom element 'contentId'
-    //
-    //   ?? Assumes contentId == resultSetContainerId
-    //
-    var resultSetContainerId = '';
-    var resultSetTableId = '';
-    //
-    if (!jsonObj.errFlag) {
-        logContext("Displaying " + contentId)
-        $(contentId).show();
-        //$(contentId + ' div.search-results').show();
-    }
-    //
-    // $(contentId).empty();
-    //
-    if ('resultSetTableData' in jsonObj) {
-        var myData = JSON.parse(jsonObj.resultSetTableData);
-        if (consoleDebug) {
-            logContext(" myData props  = " + Object.getOwnPropertyNames(myData).sort());
-        }
-        for (var myId in myData) {
-            rS = myData[myId];
-            if (Object.getOwnPropertyNames(rS).length == 0) {
-                logContext(" +Skipping empty data set key = " + myId);
-                continue;
-            }
-            //logContext(" rS props  = " + Object.getOwnPropertyNames(rS).sort());
-            resultSetContainerId = rS.resultSetContainerId;
-            $(contentId).append(rS.resultSetTableTemplate);
-
-            var resultSetTableId = rS.resultSetTableId;
-            var rsData = rS.resultSetTableData;
-
-            //logContext("data set length " + rsData.length);
-            //logContext(" data table dom id " + resultSetTableId);
-
-            $("#" + resultSetTableId).bootstrapTable({
-                data: rsData,
-                exportDataType: 'all',
-                onPostBody: function(){
-                    //logContext("Fired post body");
-                    assignReportOp("a.app-ref-report");
-                },
-                /*
-                onSort:function(){
-                    logContext("Fired sort");
-                },
-                onPageChange: function(){
-                    logContext("Fired page changed");
-                }
-                */
-            });
-            logContext("Displaying " + resultSetContainerId)
-            $(resultSetContainerId).show();
-        }
-    } else {
-        logContext(" No table data in object ")
-        logContext(" jsonObj props = " + Object.getOwnPropertyNames(jsonObj).sort());
-    }
-
-    //
-    if (jsonObj.errflag) {
-        logContext('Error flag is set  = ' + jsonObj.errflag);
-
-    }
-}
 
 function pagerFunc() {
     return {
@@ -573,267 +860,3 @@ function createSearchObserver(observeId, subSelector) {
     observer.observe(target, config);
 }
 
-//
-// Document ready entry point
-//
-
-$(document).ready(function() {
-    $("#uploadProgress").find('*').hide();
-    $('#chemref-report-results-container').hide();
-    $('#chemref-search-results-container').hide();
-
-    getCurrentContext();
-    appendContextToMenuUrls();
-    //
-    if (sessionId.length == 0) {
-        newSession('request session');
-        logContext('Assigning new session id  = ' + sessionId);
-    }
-    // logContext('Selection report container ' + $('#chemref-report-results-container').length);
-
-    if ($("#chemref-full-search-dialog").length > 0) {
-        $('#chemref-report-results-container').hide();
-        $('#chemref-search-results-container').hide();
-        /*
-        $('#report-content').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
-            if (false) {
-                logContext("Modified: " + e.target.nodeName);
-                var vc = $('#report-content  div.results-section').is(":visible");
-                logContext("vis " + vc);
-                var hc = $('#report-content  div.results-section').is(":hidden");
-                logContext("hid " + hc);
-                var num =$('#report-content  div.results-section').length
-                logContext("num " + num)
-             }
-            if ( $.trim( $('#report-content').html() ) == ""){
-                logContext("Report DIV is empty .... ");
-                $('#chemref-report-results-container').hide();
-            }
-        });
-        */
-        createReportObserver('#report-content', '#chemref-report-results-container');
-        createSearchObserver('#chemref-search-results-container', 'div.results-section');
-     /*
-        $('#chemref-search-results-container').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
-            if (false) {
-                logContext("Modified: " + e.target.nodeName);
-                var vc = $('#chemref-search-results-container  div.results-section').is(":visible");
-                logContext("vis " + vc);
-                var hc = $('#chemref-search-results-container  div.results-section').is(":hidden");
-                logContext("hid " + hc);
-            }
-                var num =$('#chemref-search-results-container  div.results-section').length
-                logContext("num " + num)
-            if ( $('#chemref-search-results-container  div.results-section').length == 0  ){
-                logContext("Search DIV is empty .... ");
-                $('#chemref-search-results-container').hide();
-            //} else {
-            //    $('#chemref-search-results-container').show();
-            }
-        });
-        */
-        $("#searchTarget1").typeahead({
-            items: 20,
-            minLength: 2,
-            source: function(query, response) {
-                $.ajax({
-                    cache: false,
-                    timeout: 60000,
-                    type: "post",
-                    url: "/service/chemref/search/autocomplete",
-                    dataType: "json",
-                    data: {
-                        term: query,
-                        extra_param: "constant1",
-                        searchType: $("#searchType1").val(),
-                        searchOp: $("#searchOp1").val()
-                    },
-                    success: function(data) {
-                        if (data != null) {
-                            response(data);
-                        }
-                    }
-                });
-            },
-            select: function(event, ui) {
-                /* console.log(ui.item ? ("Selected: " + ui.item.value + " aka " + ui.item.id) : "Nothing selected, input was " + this.value); */
-            }
-        });
-
-        <!-- chemref reference entity search form -->
-        $('#chemref-full-search-form').ajaxForm({
-            url: chemrefFullSearchUrl,
-            type: 'post',
-            dataType: 'json',
-            success: function(jsonObj) {
-                logContext("Full search completed");
-                progressEnd();
-                $('#chemref-full-search-button').show();
-                updateCompletionStatus(jsonObj, '#chemref-full-search-form');
-                updateSearchResultsBsTable(jsonObj, '#chemref-search-results-container');
-            },
-            beforeSubmit: function(arr, $form, options) {
-                $('#chemref-full-search-status.op-status').hide();
-
-                progressStart();
-                $('#chemref-full-search-button').hide();
-
-                selectValue = $("#searchType1 option:selected").text();
-
-                arr.push({
-                    "name": "searchName",
-                    "value": selectValue
-                });
-
-                arr.push({
-                    "name": "sessionid",
-                    "value": sessionId
-                });
-            }
-        });
-    }
-
-
-
-    // -- WORKING COLLECTION OF ADMIN FUNCTIONS --
-    if ($("#chemref-admin-dialog").length > 0) {
-        $('#chemref-report-results-container').hide();
-        createReportObserver('#report-content', '#chemref-report-results-container');
-        /*
-        $('#report-content').unbind("DOMSubtreeModified").bind("DOMSubtreeModified", function(e) {
-            if ( $.trim( $('#report-content').html() ) == ""){
-                logContext("Report DIV is empty .... ");
-                $('#chemref-report-results-container').hide();
-            }
-        });
-        */
-        <!-- chemref admin operations form -->
-        $('#chemref-admin-ops-form').ajaxForm({
-            url: chemrefAdminOpsUrl,
-            dataType: 'json',
-            success: function(jsonObj) {
-                //logContext("Operation completed");
-                progressEnd();
-                $('#chemref-admin-ops-button').show();
-                updateCompletionStatus(jsonObj, '#chemref-admin-ops-form');
-            },
-            beforeSubmit: function(arr, $form, options) {
-                $('#chemref-admin-ops-form div.op-status').hide();
-                progressStart();
-                $('#chemref-admin-ops-button').hide();
-                arr.push({
-                    "name": "sessionid",
-                    "value": sessionId
-                });
-            }
-        });
-
-        <!-- chemref inline idops form -->
-        $('#chemref-inline-idops-form').ajaxForm({
-            url: chemrefIdOpsUrl,
-            dataType: 'json',
-            success: function(jsonObj) {
-                //logContext("Operation completed");
-
-                updateCompletionStatus(jsonObj, '#chemref-inline-idops-form');
-                updateLinkContent(jsonObj, '#chemref-inline-idops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
-                // $('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
-                // $('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
-                //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
-                $('#chemref-report-results-container  div.report-content').show();
-                $('#chemref-inline-idops-button').show();
-                progressEnd();
-            },
-            beforeSubmit: function(arr, $form, options) {
-                $('#chemref-inline-idops-form div.op-status').hide();
-                $('#chemref-inline-idops-form div.op-links').hide();
-                $('#chemref-report-results-container  div.report-content').hide();
-
-                progressStart();
-                $('#chemref-inline-idops-button').hide();
-                arr.push({
-                    "name": "sessionid",
-                    "value": sessionId
-                });
-            }
-        });
-
-
-
-
-        <!-- chemref inline fileops form -->
-        $('#chemref-inline-fileops-form').ajaxForm({
-            url: chemrefFileOpsUrl,
-            dataType: 'json',
-            success: function(jsonObj) {
-                //logContext("Operation completed");
-
-                updateCompletionStatus(jsonObj, '#chemref-inline-fileops-form');
-                updateLinkContent(jsonObj, '#chemref-inline-fileops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
-
-                //$('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
-                //$('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
-                //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
-
-                $('#chemref-report-results-container  div.report-content').show();
-                $('#chemref-inline-fileops-button').show();
-                progressEnd();
-            },
-            beforeSubmit: function(arr, $form, options) {
-                $('#chemref-inline-idops-form div.op-status').hide();
-                $('#chemref-inline-idops-form div.op-links').hide();
-                $('#chemref-report-results-container  div.report-content').hide();
-
-                progressStart();
-                $('#chemref-inline-fileops-button').hide();
-                arr.push({
-                    "name": "sessionid",
-                    "value": sessionId
-                });
-            }
-        });
-
-    }
-
-    // -- chemref editor --
-    if ($("#chemref-editor-dialog").length > 0) {
-        $('#chemref-editor-form').ajaxForm({
-            url: chemrefEditorUrl,
-            dataType: 'json',
-            success: function(jsonObj) {
-                progressEnd();
-                $('#chemref-editor-button').show();
-                updateCompletionStatus(jsonObj, '#chemref-editor-form');
-                if (('location' in jsonObj) && (jsonObj.location != "")) {
-                    window.open(jsonObj.location, '_blank');
-                }
-            },
-            beforeSubmit: function(arr, $form, options) {
-                $('#chemref-editor-form div.op-status').hide();
-                progressStart();
-                $('#chemref-editor-button').hide();
-                arr.push({
-                    "name": "sessionid",
-                    "value": sessionId
-                });
-            }
-        });
-    }
-
-    <!-- Download task operations -->
-    if ($("#download-dialog").length > 0) {
-        $("#download-logfiles").hide();
-        $("#download-logfiles-label").hide();
-        var sObj = getSessionInfo();
-        updateDownloadOptions(sObj);
-        //
-        $('#download-url').hide();
-        $("#download-url-label").html(getDownloadFileName());
-        setDownloadFileUrl("#download-url");
-    }
-    //    <!-- make the nav item for the current page active -->
-    $('.nav a[href="' + pagePath + '"]').parent().addClass('active');
-
-}); // end-ready

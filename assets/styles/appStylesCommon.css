@@ -547,3 +547,11 @@ th.rs1 {
     position: relative;
 }
 */
+
+/* override bootstrap navs.less block display */
+
+.tab-content .tab-flex.active {
+	display: flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
