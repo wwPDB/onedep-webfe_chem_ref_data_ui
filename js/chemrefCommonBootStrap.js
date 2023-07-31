@@ -497,6 +497,9 @@ function set3dEventListener(jsonObj, tab_name){
 	    if(document.getElementsByClassName(jsmolId)){
 	         let a = document.getElementsByClassName(jsmolId)[0];
 		 if(a){
+		    a.removeEventListener("click", function(){
+	               updateJsmolViews(jsonObj, tab_name);
+	            });
 		    a.addEventListener("click", function(){
 	               updateJsmolViews(jsonObj, tab_name);
 	            }.bind(jsonObj));
