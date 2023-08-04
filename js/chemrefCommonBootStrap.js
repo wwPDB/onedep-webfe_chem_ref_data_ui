@@ -222,7 +222,7 @@ $(document).ready(function() {
 
                 updateCompletionStatus(jsonObj, '#chemref-inline-idops-form');
                 updateLinkContent(jsonObj, '#chemref-inline-idops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
+                updateReportContent(jsonObj, '#chemref-report-results-container', "admin");
                 // $('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
                 // $('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
                 //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
@@ -254,7 +254,7 @@ $(document).ready(function() {
 
                 updateCompletionStatus(jsonObj, '#chemref-inline-fileops-form');
                 updateLinkContent(jsonObj, '#chemref-inline-fileops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container');
+                updateReportContent(jsonObj, '#chemref-report-results-container', "admin");
 
                 //$('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
                 //$('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
@@ -443,7 +443,7 @@ function assignReportOp(selector) {
                 if('idCodeList' in jsonObj){
 			if(jsonObj.idCodeList.length > 0){
 				//logContext("updating " + jsonObj.idCodeList);
-                		updateReportContent(jsonObj, '#chemref-report-results-container');
+                		updateReportContent(jsonObj, '#chemref-report-results-container', "search");
                 		//assignReportOp("a.app-ref-report");
 			} else {
 				logContext("could not find object on page " + jsonObj.idCodeList);
@@ -454,7 +454,7 @@ function assignReportOp(selector) {
     });
 }
 
-function updateReportContent(jsonObj, contentId) {
+function updateReportContent(jsonObj, contentId, tab_name) {
     var retHtml = jsonObj.htmlcontent;
     var errFlag = jsonObj.errorflag;
     logContext('Updating report content for ' + jsonObj.idCodeList + ' at ' + contentId);
@@ -473,8 +473,8 @@ function updateReportContent(jsonObj, contentId) {
              }
         });
         selectValue = $("#searchType1 option:selected").text();
-        // Activate 3D views
-        if(! jsonObj.idCodeList[0].startsWith("FAM")){
+        // Activate 3D views on search tab
+        if(tab_name == "search" && ! jsonObj.idCodeList[0].startsWith("FAM")){
        		set3dEventListener(jsonObj, '3d');
        		set3dEventListener(jsonObj, 'ataglance');
 	}
