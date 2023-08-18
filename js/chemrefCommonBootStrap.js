@@ -219,10 +219,16 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(jsonObj) {
                 //logContext("Operation completed");
+                
+		let selectValue = $('#chemref-inline-idops-form').find('select[name="operation"]').val();
+		let tab_name = "admin";
+		if(selectValue == "report"){
+			tab_name = "admin-report";
+		}
 
                 updateCompletionStatus(jsonObj, '#chemref-inline-idops-form');
                 updateLinkContent(jsonObj, '#chemref-inline-idops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container', "admin");
+                updateReportContent(jsonObj, '#chemref-report-results-container', tab_name);
                 // $('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
                 // $('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
                 //$('#chemref-report-results-container  div.multi-accordion-style').multiOpenAccordion({active: 0 });
@@ -252,9 +258,15 @@ $(document).ready(function() {
             success: function(jsonObj) {
                 //logContext("Operation completed");
 
+		let selectValue = $('#chemref-inline-fileops-form').find('select[name="operation"]').val();
+		let tab_name = "admin";
+		if(selectValue == "report"){
+			tab_name = "admin-report";
+		}
+
                 updateCompletionStatus(jsonObj, '#chemref-inline-fileops-form');
                 updateLinkContent(jsonObj, '#chemref-inline-fileops-form');
-                updateReportContent(jsonObj, '#chemref-report-results-container', "admin");
+                updateReportContent(jsonObj, '#chemref-report-results-container', tab_name);
 
                 //$('#chemref-report-results-container  div.tab-style').tabs({ collapsible: true });
                 //$('#chemref-report-results-container  div.accordion-style').accordion({ collapsible: true, heightStyle: "content" });
@@ -472,11 +484,15 @@ function updateReportContent(jsonObj, contentId, tab_name) {
             $($(this).attr("data-target")).toggleClass('active');
              }
         });
-        selectValue = $("#searchType1 option:selected").text();
-        // Activate 3D views on search tab
-        if(tab_name == "search" && ! jsonObj.idCodeList[0].startsWith("FAM")){
-       		set3dEventListener(jsonObj, '3d');
-       		set3dEventListener(jsonObj, 'ataglance');
+        if(tab_name == "search"){
+        	selectValue = $("#searchType1 option:selected").text();
+	}
+        // Activate 3D views on search tab or admin tab when creating report
+        if(tab_name == "search" || tab_name == "admin-report"){
+		if(! jsonObj.idCodeList[0].startsWith("FAM")){
+       			set3dEventListener(jsonObj, '3d');
+       			set3dEventListener(jsonObj, 'ataglance');
+		}
 	}
     } else {
 	logContext('error flag on ' + contentId);
@@ -485,6 +501,7 @@ function updateReportContent(jsonObj, contentId, tab_name) {
 }
 
 function set3dEventListener(jsonObj, tab_name){
+    // load 3d models on demand rather than on search completion
     if ('webPathList' in jsonObj && 'idCodeList' in jsonObj) {
         var webPathList = jsonObj.webPathList.toString().split(",");
         var idCodeList = jsonObj.idCodeList.toString().split(",");
