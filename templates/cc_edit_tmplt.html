@@ -77,6 +77,7 @@ $(document).ready(function() {
            feature:{posx:2,posy:2340,width:1200,height:200},
            related:{posx:2,posy:2585,width:1200,height:200},
            relatedatom:{posx:2,posy:2830,width:1200,height:200},
+           pcm:{posx:2,posy:3075,width:1200,height:200},
            view:{compModel:jQuery.cifEdit.%(ccmodel)s,
                  atomModel:jQuery.cifEdit.compAtomModel,
                  bondModel:jQuery.cifEdit.compBondModel,
@@ -85,6 +86,7 @@ $(document).ready(function() {
                  featureModel:jQuery.cifEdit.compFeatureModel,
                  relatedModel:jQuery.cifEdit.compRelatedModel,
                  relatedAtomModel:jQuery.cifEdit.atomRelatedModel,
+                 pcmModel:jQuery.cifEdit.pcmModel,
                  hydrogensjmm:false,
                  hydrogensjm:false,
                  jmolMode:'3di',
@@ -96,7 +98,7 @@ $(document).ready(function() {
               jQuery.chemWin.loadCifUrl('chemWin',cifUrl,instanceId);
               $('#chemWinLoading').hide();
               $('#help_link').html('<span style="display:inline;" class="ui-icon ui-icon-info">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-              var wnds=["Edit","Comp","Jmolm","Jmol","Atoms","Bonds","Audit","File","Synonym","Feature","Related","RelatedAtom"];
+              var wnds=["Edit","Comp","Jmolm","Jmol","Atoms","Bonds","Audit","File","Synonym","Feature","Related","RelatedAtom","PCM"];
               var wpos={Jmolm:"top",Jmol:"top"};
               var wwdth={Comp:300,Jmolm:300,Jmol:300};
               var iconWinFocus=function(wm){
@@ -110,9 +112,9 @@ $(document).ready(function() {
                   $('#help_link_'+wnm+'').click(iconWinFocus(wnm));
               }
             
-              if ($('#chemRelatedAtom_chemWin_window').length) {
-                contentSize += $('#chemRelatedAtom_chemWin_window').position().top +
-                $('#chemRelatedAtom_chemWin_window').height() +
+              if ($('#chemPcm_chemWin_window').length) {
+                contentSize += $('#chemPcm_chemWin_window').position().top +
+                $('#chemPcm_chemWin_window').height() +
                 $('.window-titleBar').height() +
                 $('.window-statusBar').height() + 10;
 
