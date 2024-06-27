@@ -74,19 +74,19 @@ $(document).ready(function() {
            audit:{posx:2,posy:1655,width:1200,height:200},
            file:{posx:2,posy:1900,width:1200,height:150}, 
            synonym:{posx:2,posy:2095,width:1200,height:200},
-           feature:{posx:2,posy:2340,width:1200,height:200},
-           related:{posx:2,posy:2585,width:1200,height:200},
-           relatedatom:{posx:2,posy:2830,width:1200,height:200},
-           pcm:{posx:2,posy:3075,width:1200,height:200},
+           pcm:{posx:2,posy:2340,width:1200,height:200},
+           feature:{posx:2,posy:2585,width:1200,height:200},
+           related:{posx:2,posy:2830,width:1200,height:200},
+           relatedatom:{posx:2,posy:3075,width:1200,height:200},
            view:{compModel:jQuery.cifEdit.%(ccmodel)s,
                  atomModel:jQuery.cifEdit.compAtomModel,
                  bondModel:jQuery.cifEdit.compBondModel,
                  auditModel:jQuery.cifEdit.compAuditModel,
                  synonymModel:jQuery.cifEdit.compSynonymModel,
+                 pcmModel:jQuery.cifEdit.pcmModel,
                  featureModel:jQuery.cifEdit.compFeatureModel,
                  relatedModel:jQuery.cifEdit.compRelatedModel,
                  relatedAtomModel:jQuery.cifEdit.atomRelatedModel,
-                 pcmModel:jQuery.cifEdit.pcmModel,
                  hydrogensjmm:false,
                  hydrogensjm:false,
                  jmolMode:'3di',
@@ -98,7 +98,7 @@ $(document).ready(function() {
               jQuery.chemWin.loadCifUrl('chemWin',cifUrl,instanceId);
               $('#chemWinLoading').hide();
               $('#help_link').html('<span style="display:inline;" class="ui-icon ui-icon-info">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>');
-              var wnds=["Edit","Comp","Jmolm","Jmol","Atoms","Bonds","Audit","File","Synonym","Feature","Related","RelatedAtom","PCM"];
+              var wnds=["Edit","Comp","Jmolm","Jmol","Atoms","Bonds","Audit","File","Synonym","PCM","Feature","Related","RelatedAtom"];
               var wpos={Jmolm:"top",Jmol:"top"};
               var wwdth={Comp:300,Jmolm:300,Jmol:300};
               var iconWinFocus=function(wm){
@@ -112,9 +112,9 @@ $(document).ready(function() {
                   $('#help_link_'+wnm+'').click(iconWinFocus(wnm));
               }
             
-              if ($('#chemPcm_chemWin_window').length) {
-                contentSize += $('#chemPcm_chemWin_window').position().top +
-                $('#chemPcm_chemWin_window').height() +
+              if ($('#chemRelatedAtom_chemWin_window').length) {
+                contentSize += $('#chemRelatedAtom_chemWin_window').position().top +
+                $('#chemRelatedAtom_chemWin_window').height() +
                 $('.window-titleBar').height() +
                 $('.window-statusBar').height() + 10;
 
