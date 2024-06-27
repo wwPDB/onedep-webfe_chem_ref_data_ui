@@ -77,17 +77,6 @@ $(document).ready(function() {
     // logContext('Selection report container ' + $('#chemref-report-results-container').length);
 
     if ($("#chemref-full-search-dialog").length > 0) {
-        // performing search on load if there are search parameters
-        const urlObj = new URLSearchParams(window.location.search);
-
-        if (urlObj.has('searchTarget')) {
-            const searchType = 'CCD_CC_ID,CCD_CC_ID|CCD_ENTITY|MULTI_VALUE_WS|EQUAL,LIKE';
-            const searchTarget = urlObj.get('searchTarget');
-            
-            $('#searchType1').val(searchType);
-            $('#searchTarget1').val(searchTarget);
-        }
-
         $('#chemref-report-results-container').hide();
         $('#chemref-search-results-container').hide();
         /*
@@ -306,6 +295,15 @@ $(document).ready(function() {
 
     // -- chemref editor --
     if ($("#chemref-editor-dialog").length > 0) {
+        // performing search on load if there are search parameters
+        const urlObj = new URLSearchParams(window.location.search);
+
+        if (urlObj.has('searchTarget')) {
+            const searchTarget = urlObj.get('searchTarget');
+
+            $('#chemref-idcode-1').val(searchTarget);
+        }
+
         $('#chemref-editor-form').ajaxForm({
             url: chemrefEditorUrl,
             dataType: 'json',
