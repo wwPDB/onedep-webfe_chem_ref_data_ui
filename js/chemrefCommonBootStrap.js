@@ -417,11 +417,11 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
                 });
                 notInstanceSearch = similarity.find(".panel-title:contains('public')").length == 0 && similarity.find(".panel-title:contains('internal')").length == 0;
                 if(notInstanceSearch){
-		   // expand exact results on 3-or-5-letter cc id, restrict to 10
+		   // expand exact results on cc id, restrict to 10
 		   // keep chevron closed for readability
 		   // chevron = $(contentId).find(".chevron").parent();
 		   // chevron.click();
-		   $(contentId).find(".app-ref-report").filter(function(){return $(this).text().length == 3 || $(this).text().length == 5}).slice(0,MAX_OPEN_REPORTS).click();
+		   $(contentId).find(".app-ref-report").filter(function(){return $(this).text().length >= 1 && $(this).text().length <= 5}).slice(0,MAX_OPEN_REPORTS).click();
                 }
 	    }
 
