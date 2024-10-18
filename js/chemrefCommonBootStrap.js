@@ -39,6 +39,7 @@ var getSessionInfoServiceUrl = '/service/chemref/getsessioninfo';
 var pagePath = '';
 var MAX_OPEN_REPORTS = 10;
 var TARGET_LIST = null;
+var OPEN_REPORT = false;
 
 (function() {
     var b, d, c = this,
@@ -152,6 +153,7 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(jsonObj) {
                 logContext("Full search completed");
+                OPEN_REPORT = false;
                 progressEnd();
                 $('#chemref-full-search-button').show();
                 updateCompletionStatus(jsonObj, '#chemref-full-search-form');
@@ -422,7 +424,22 @@ function updateSearchResultsBsTable(jsonObj, contentId) {
 		   // chevron = $(contentId).find(".chevron").parent();
 		   // chevron.click();
 		   $(contentId).find(".app-ref-report").filter(function(){return $(this).text().length >= 1 && $(this).text().length <= 5}).slice(0,MAX_OPEN_REPORTS).click();
-                }
+                } else if(OPEN_REPORT == false){
+                   OPEN_REPORT = true;
+                   let anchors = document.getElementById("chemref-search-results-container").getElementsByClassName("app-ref-report");
+                   let target = TARGET_LIST.split(",")[0];
+                   for(var x = 0; x < anchors.length; x++){
+                      let anchor = anchors[x];
+                      let html = anchor.innerHTML;
+                      if(!html)
+                         continue;
+                      if(html.indexOf(target) == 0){
+                         logContext(`selecting anchor with text ${anchor.innerHTML}`);
+                         anchor.click();
+                         break;
+                      }
+                   }
+		}
 	    }
 
             logContext("Displaying result set container id " + resultSetContainerId)
