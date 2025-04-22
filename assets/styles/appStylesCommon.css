@@ -552,6 +552,17 @@ th.rs1 {
 
 .tab-content .tab-flex.active {
 	display: flex;
+        flex-direction: row;
 	justify-content: flex-start;
 	align-items: flex-start;
 }
+
+@media(max-width: 1300px){
+    .tab-content .tab-flex.active {
+	display: flex;
+        flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+    }
+}
+
