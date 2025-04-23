@@ -555,14 +555,5 @@ th.rs1 {
         flex-direction: row;
 	justify-content: flex-start;
 	align-items: flex-start;
+        flex-wrap: wrap;
 }
-
-@media(max-width: 1300px){
-    .tab-content .tab-flex.active {
-	display: flex;
-        flex-direction: column;
-	justify-content: flex-start;
-	align-items: flex-start;
-    }
-}
-
