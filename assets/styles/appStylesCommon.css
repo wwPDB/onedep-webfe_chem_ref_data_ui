@@ -553,7 +553,7 @@ th.rs1 {
 .tab-content .tab-flex.active {
 	display: flex;
         flex-direction: row;
-	justify-content: flex-start;
+	justify-content: space-between;
 	align-items: flex-start;
         flex-wrap: wrap;
 }
