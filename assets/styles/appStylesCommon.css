@@ -553,7 +553,9 @@ th.rs1 {
 .tab-content .tab-flex.active {
 	display: flex;
         flex-direction: row;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: flex-start;
+        column-gap: 1%;
         flex-wrap: wrap;
 }
+
