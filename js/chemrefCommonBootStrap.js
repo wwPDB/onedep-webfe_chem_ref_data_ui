@@ -609,7 +609,7 @@ function makeJsMolView(search_val, webXyzPath, xyzType, tab_name){
    let adjustment = 3;
    width = Number(width) - Number(padding) - Number(margin) - Number(border);
    height = Number(height) - Number(padding) - Number(margin) - Number(border) - adjustment;
-   j2s_path = '/assets/js/JSmol-16.3.23/jsmol/j2s';
+   j2s_path = '/assets/js/jsmol-latest/j2s';
    view = new Viewer(
                    container_name,
                    search_val,
