@@ -60,6 +60,7 @@ $(document).ready(function() {
         jQuery.cifEdit.processing_site = '%(processing_site)s';
         jQuery.cifEdit.ccModuleFlag = true;
         jQuery.cifEdit.existingCCFlag = 'yes';
+        jQuery.cifEdit.ccEditorFlag = true;
         var instanceId  = '%(instanceid)s';
         var cifUrl = '%(urlcifpath)s';
 
@@ -75,15 +76,19 @@ $(document).ready(function() {
            file:{posx:2,posy:1900,width:1200,height:150}, 
            synonym:{posx:2,posy:2095,width:1200,height:200},
            pcm:{posx:2,posy:2340,width:1200,height:200},
-           feature:{posx:2,posy:2585,width:1200,height:200},
-           related:{posx:2,posy:2830,width:1200,height:200},
-           relatedatom:{posx:2,posy:3075,width:1200,height:200},
+           coordination:{posx:2,posy:2585,width:1200,height:200},
+           sphere:{posx:2,posy:2830,width:1200,height:200},
+           feature:{posx:2,posy:3075,width:1200,height:200},
+           related:{posx:2,posy:3320,width:1200,height:200},
+           relatedatom:{posx:2,posy:3563,width:1200,height:200},
            view:{compModel:jQuery.cifEdit.%(ccmodel)s,
                  atomModel:jQuery.cifEdit.compAtomModel,
                  bondModel:jQuery.cifEdit.compBondModel,
                  auditModel:jQuery.cifEdit.compAuditModel,
                  synonymModel:jQuery.cifEdit.compSynonymModel,
                  pcmModel:jQuery.cifEdit.pcmModel,
+                 coordinationModel:jQuery.cifEdit.compCoordinationModel,
+                 sphereModel:jQuery.cifEdit.compSphereModel,
                  featureModel:jQuery.cifEdit.compFeatureModel,
                  relatedModel:jQuery.cifEdit.compRelatedModel,
                  relatedAtomModel:jQuery.cifEdit.atomRelatedModel,
